@@ -33,12 +33,16 @@ typedef enum {
 } RunKeeperActivityType;
 
 @interface RunKeeper : NSObject <NXOAuth2ClientDelegate> {
+    
+@private
     NXOAuth2Client *oauthClient; 
     BOOL connected;
     NSDictionary *paths;
     NSNumber *userID;
+    NSString *clientID, *clientSecret;
 }
 
+@property (nonatomic, retain) NSString *clientID, *clientSecret;
 @property (nonatomic, retain, readonly) NXOAuth2Client *oauthClient;
 @property (nonatomic, readonly) BOOL connected;
 @property (nonatomic, retain) NSDictionary *paths;
@@ -46,6 +50,7 @@ typedef enum {
 
 + (RunKeeper *)sharedRunKeeper;
 
+- (void)setClientID:(NSString*)clientID clientSecret:(NSString*)secret;
 - (void)handleOpenURL:(NSURL *)url;
 - (void)connect;
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance

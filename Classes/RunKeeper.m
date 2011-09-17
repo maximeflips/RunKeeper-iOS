@@ -10,12 +10,10 @@
 #import "SynthesizeSingleton.h"
 #import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
-#import "GTMNSDictionary+URLArguments.h"
-#import "JSON.h"
-#import "NSObject+SBJSON.h"
+#import "SBJson.h"
+#import "NSObject+SBJson.h"
 
-#define kRunKeeperClientID @"bb22d96326844785909a32225799bb16"
-#define kRunKeeperClientSecret @"7d5cd12808b44e98a69561be2bad69b2"
+
 #define kRunKeeperAuthorizationURL @"https://runkeeper.com/apps/authorize"
 #define kRunKeeperAccessTokenURL @"https://runkeeper.com/apps/token"
 
@@ -24,7 +22,7 @@
 
 #define kRKBackgroundActivitiesKey        @"background_activities"
 #define kRKDiabetesKey                    @"diabetes"
-#define kRKFitnessActivitiesKey            @"fitness_activities"
+#define kRKFitnessActivitiesKey           @"fitness_activities"
 #define kRKGeneralMeasurementsKey         @"general_measurements"
 #define kRKNutritionKey                   @"nutrition"
 #define kRKProfileKey                     @"profile"
@@ -39,8 +37,15 @@
 @implementation RunKeeper
 
 @synthesize oauthClient, connected, paths, userID;
+@synthesize clientID, clientSecret;
 
 SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
+
+- (void)setClientID:(NSString*)clientID clientSecret:(NSString*)secret
+{
+    self.clientID = clientID;
+    self.clientSecret = secret;
+}
 
 - (void)connect
 {
@@ -134,7 +139,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
     [self request:kRunKeeperBaseURL params:nil onCompletion:^(id json) {
         self.paths = json;
         self.userID = [self.paths objectForKey:@"kRKUserIDKey"];
-    }onFailed:^{
+    } onFailed:^{
         self.paths = nil;
         self.userID = nil;
         connected = NO;
@@ -147,20 +152,20 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
 - (NSString*)activityString:(RunKeeperActivityType)activity
 {
     switch (activity) {
-        case kRKRunning: return @"Running";
-        case kRKCycling: return @"Cycling";
+        case kRKRunning:        return @"Running";
+        case kRKCycling:        return @"Cycling";
         case kRKMountainBiking: return @"Mountain Biking";
-        case kRKWalking: return @"Walking";
-        case kRKHiking: return @"Hiking";
+        case kRKWalking:        return @"Walking";
+        case kRKHiking:         return @"Hiking";
         case kRKDownhillSkiing: return @"Downhill Skiing";
         case kRKXCountrySkiing: return @"Cross Country Skiing";
-        case kRKSnowboarding: return @"Snowboarding";
-        case kRKSkating: return @"Skating";
-        case kRKSwimming: return @"Swimming";
-        case kRKWheelchair: return @"Wheelchair";
-        case kRKRowing: return @"Rowing";
-        case kRKElliptical: return @"Elliptical";
-        case kRKOther: return @"Other";
+        case kRKSnowboarding:   return @"Snowboarding";
+        case kRKSkating:        return @"Skating";
+        case kRKSwimming:       return @"Swimming";
+        case kRKWheelchair:     return @"Wheelchair";
+        case kRKRowing:         return @"Rowing";
+        case kRKElliptical:     return @"Elliptical";
+        case kRKOther:          return @"Other";
     }
     return @"Running";
 }
@@ -252,8 +257,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
         return oauthClient;
     }
     
-    oauthClient = [[NXOAuth2Client alloc] initWithClientID:kRunKeeperClientID
-                                              clientSecret:kRunKeeperClientSecret
+    assert(clientID);
+    assert(clientSecret);
+    oauthClient = [[NXOAuth2Client alloc] initWithClientID:clientID
+                                              clientSecret:clientSecret
                                               authorizeURL:[NSURL URLWithString:kRunKeeperAuthorizationURL]
                                                   tokenURL:[NSURL URLWithString:kRunKeeperAccessTokenURL]
                                                   delegate:self];

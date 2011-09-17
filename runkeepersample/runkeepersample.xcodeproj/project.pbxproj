@@ -61,6 +61,7 @@
 		63C1FC65142426D10074CF99 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC64142426D10074CF99 /* Security.framework */; };
 		63C1FC67142426DC0074CF99 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC66142426DC0074CF99 /* libz.dylib */; };
 		63C1FC69142426EB0074CF99 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC68142426EB0074CF99 /* MobileCoreServices.framework */; };
+		63C1FC6C14242FB60074CF99 /* RunKeeper.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC6A14242FB50074CF99 /* RunKeeper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -175,6 +176,9 @@
 		63C1FC64142426D10074CF99 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		63C1FC66142426DC0074CF99 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		63C1FC68142426EB0074CF99 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		63C1FC6A14242FB50074CF99 /* RunKeeper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RunKeeper.m; path = ../../Classes/RunKeeper.m; sourceTree = "<group>"; };
+		63C1FC6B14242FB60074CF99 /* RunKeeper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RunKeeper.h; path = ../../Classes/RunKeeper.h; sourceTree = "<group>"; };
+		63C1FC6D142433FC0074CF99 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SynthesizeSingleton.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,6 +249,8 @@
 		63C1FBB91424230F0074CF99 /* runkeepersample */ = {
 			isa = PBXGroup;
 			children = (
+				63C1FC6A14242FB50074CF99 /* RunKeeper.m */,
+				63C1FC6B14242FB60074CF99 /* RunKeeper.h */,
 				63C1FC5A1424266B0074CF99 /* Util */,
 				63C1FBF21424261B0074CF99 /* SBJson */,
 				63C1FC0C1424261B0074CF99 /* ASI */,
@@ -407,6 +413,7 @@
 		63C1FC5A1424266B0074CF99 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				63C1FC6D142433FC0074CF99 /* SynthesizeSingleton.h */,
 				63C1FC5B142426750074CF99 /* Reachability.m */,
 				63C1FC5C142426750074CF99 /* Reachability.h */,
 			);
@@ -554,6 +561,7 @@
 				63C1FC581424261C0074CF99 /* NXOAuth2PostBodyPart.m in Sources */,
 				63C1FC591424261C0074CF99 /* NXOAuth2PostBodyStream.m in Sources */,
 				63C1FC5D142426750074CF99 /* Reachability.m in Sources */,
+				63C1FC6C14242FB60074CF99 /* RunKeeper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
