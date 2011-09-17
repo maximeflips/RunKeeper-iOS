@@ -12,6 +12,17 @@
 	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>com.brierwooddesign.${PRODUCT_NAME:rfc1034identifier}</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.brierwooddesign.rkexample.oauth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>rk055cac1c950b46e6ac7910d62800a854</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

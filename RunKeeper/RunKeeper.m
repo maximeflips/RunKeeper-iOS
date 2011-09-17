@@ -34,6 +34,17 @@
 #define kRKUserIDKey                      @"userID"
 #define kRKWeightKey                      @"weight"
 
+NSString *const kBRBitlyErrorDomain = @"RunKeeperErrorDomain";
+NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
+
+@interface RunKeeper()
+
+- (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt;
+- (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
+
+@end
+
+
 @implementation RunKeeper
 
 @synthesize oauthClient, connected, paths, userID;
@@ -41,21 +52,49 @@
 
 SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
 
-- (void)setClientID:(NSString*)clientID clientSecret:(NSString*)secret
+- (void)setClientID:(NSString*)_clientID clientSecret:(NSString*)secret
 {
-    self.clientID = clientID;
+    self.clientID = _clientID;
     self.clientSecret = secret;
 }
 
-- (void)connect
+- (void)tryToConnect:(id <RunKeeperConnectionDelegate>)_delegate;
 {
+    delegate = _delegate;
     [self.oauthClient requestAccess];
 }
+
+- (void)tryToAuthorize
+{
+    NSString *oauth_path = [NSString stringWithFormat:@"rk%@", self.clientID];
+    NSURL *authorizationURL = [self.oauthClient authorizationURLWithRedirectURL:[NSURL URLWithString:oauth_path]];
+    [[UIApplication sharedApplication] openURL:authorizationURL];
+}
+
 
 - (void)handleOpenURL:(NSURL *)url
 {
     [self.oauthClient openRedirectURL:url];
 }
+
+- (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt {
+	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+	NSString *status = [bundle localizedStringForKey:bitlyStatusTxt value:bitlyStatusTxt table:@"RunKeeperErrors"];
+    
+	return status;
+}
+
+- (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status {
+	NSMutableDictionary *userDict = [NSMutableDictionary dictionary];
+	[userDict setObject:status forKey:kBRBitlyStatusTextKey];
+	status = [self localizedStatusText:status];
+	if(status)
+		[userDict setObject:status forKey:NSLocalizedDescriptionKey];
+	NSError *bitlyError = [NSError errorWithDomain:kBRBitlyErrorDomain code:code userInfo:userDict];
+    
+	return bitlyError;
+}
+
 
 - (ASIHTTPRequest*)createStandardRequest:(NSURL*)url
 {
@@ -65,12 +104,9 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
     return request;    
 }
 
-- (ASIHTTPRequest*)createRequest:(NSString*)path params:(NSDictionary*)params {
+- (ASIHTTPRequest*)createRequest:(NSString*)path {
     NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
-    if (params != nil) {
-        str = [str stringByAppendingFormat:@"?%@", [params gtm_httpArgumentsString]];
-    }
-    NSLog(@"request URL: %@ params=%@", str, params);
+    NSLog(@"request URL: %@", str);
     NSURL *url = [NSURL URLWithString:str];
     return [self createStandardRequest:url];
 }
@@ -90,8 +126,8 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
 }
 
 
-- (ASIHTTPRequest*)request:(NSString*)path params:(NSDictionary*)params onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __block ASIHTTPRequest *request = [self createRequest:path params:params];    
+- (ASIHTTPRequest*)request:(NSString*)path onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
+    __block ASIHTTPRequest *request = [self createRequest:path];    
     
     [request setCompletionBlock:^{
         // Use when fetching text data
@@ -136,7 +172,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
 
 - (void)getBasePaths
 {
-    [self request:kRunKeeperBaseURL params:nil onCompletion:^(id json) {
+    [self request:kRunKeeperBaseURL onCompletion:^(id json) {
         self.paths = json;
         self.userID = [self.paths objectForKey:@"kRKUserIDKey"];
     } onFailed:^{
@@ -198,7 +234,10 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
      duration:[NSNumber numberWithInt:3600]
      calories:nil heartRate:nil notes:@"Good to go" path:nil];
      */
-    [self connect];
+    if (!connected) {
+        if (failed) failed();
+        return;
+    }
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
                           [self activityString:activity], @"type",
                           start, @"start_time",
@@ -217,39 +256,40 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
     }];
 }
 
-
 #pragma mark NXOAuth2ClientDelegate
 
 - (void)oauthClientDidGetAccessToken:(NXOAuth2Client *)client
 {
     NSLog(@"didGetAccessToken");
     connected = YES;
-    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connected" 
-        message:@"Running Intensity is linked to your RunKeeper account"
-        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
-    [alert show];
     [self getBasePaths];
+    if (delegate && [delegate respondsToSelector:@selector(connected)]) {
+        [delegate connected];
+    }
     
 }
 - (void)oauthClientDidLoseAccessToken:(NXOAuth2Client *)client
 {
-    connected = NO;
     NSLog(@"didLoseAccessToken");
+    connected = NO;
+    if (delegate && [delegate respondsToSelector:@selector(connectionFailed:)]) {
+        [delegate connectionFailed:nil];
+    }
 }
 - (void)oauthClient:(NXOAuth2Client *)client didFailToGetAccessTokenWithError:(NSError *)error
 {
-    connected = NO;
     NSLog(@"didFailToGetAccessToken");
-    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connection Failed" 
-                                                     message:@"The link to your RunKeeper account failed."
-                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
-    [alert show];
+    connected = NO;
+    if (delegate && [delegate respondsToSelector:@selector(connectionFailed:)]) {
+        [delegate connectionFailed:nil];
+    }
 }
 
 - (void)oauthClientNeedsAuthentication:(NXOAuth2Client *)client
 {
-    NSURL *authorizationURL = [client authorizationURLWithRedirectURL:[NSURL URLWithString:@"x-runningintensity://oauth2"]];
-    [[UIApplication sharedApplication] openURL:authorizationURL];   
+    if (delegate && [delegate respondsToSelector:@selector(needsAuthentication)]) {
+        [delegate needsAuthentication];
+    }
 }
 
 - (NXOAuth2Client*)oauthClient {

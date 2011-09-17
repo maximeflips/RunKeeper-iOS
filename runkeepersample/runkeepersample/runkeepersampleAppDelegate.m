@@ -30,7 +30,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [[RunKeeper sharedRunKeeper] setClientID:kRunKeeperClientID clientSecret:kRunKeeperClientSecret];
-    
+    [[RunKeeper sharedRunKeeper] tryToConnect:nil];
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
     self.window.rootViewController = self.navigationController;

@@ -32,6 +32,20 @@ typedef enum {
     kRKOther
 } RunKeeperActivityType;
 
+@protocol RunKeeperConnectionDelegate <NSObject>
+
+@optional
+// Connected is called when an existing auth token is found
+- (void)connected;
+
+// Called when the request to connect to runkeeper failed
+- (void)connectionFailed:(NSError*)err;
+
+// Called when authentication is needed to connect to RunKeeper --- normally, the client app will call
+// tryToAuthorize at this point
+- (void)needsAuthentication;
+@end
+
 @interface RunKeeper : NSObject <NXOAuth2ClientDelegate> {
     
 @private
@@ -40,6 +54,7 @@ typedef enum {
     NSDictionary *paths;
     NSNumber *userID;
     NSString *clientID, *clientSecret;
+    id <RunKeeperConnectionDelegate> delegate;
 }
 
 @property (nonatomic, retain) NSString *clientID, *clientSecret;
@@ -52,7 +67,8 @@ typedef enum {
 
 - (void)setClientID:(NSString*)clientID clientSecret:(NSString*)secret;
 - (void)handleOpenURL:(NSURL *)url;
-- (void)connect;
+- (void)tryToConnect:(id <RunKeeperConnectionDelegate>)delegate;
+- (void)tryToAuthorize;
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
                  duration:(NSNumber*)duration calories:(NSNumber*)calories heartRate:(NSNumber*)heartRate
                     notes:(NSString*)notes path:(NSArray*)path
@@ -60,3 +76,6 @@ typedef enum {
 
 
 @end
+
+extern NSString *const kRunKeeperErrorDomain;
+extern NSString *const kRunKeeperStatusTextKey;

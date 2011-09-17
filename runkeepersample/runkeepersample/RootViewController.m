@@ -10,12 +10,13 @@
 
 @implementation RootViewController
 
-@synthesize progressLabel, startButton;
+@synthesize progressLabel, startButton, pauseButton;
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.title = @"RunKeeper Sample";
+    self.progressLabel.text = @"Touch start to begin";
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -43,10 +44,43 @@
     
 }
 
+- (IBAction)togglePause
+{
+    
+}
+
 - (IBAction)connectToRunKeeper
 {
     
 }
+
+#pragma mark RunKeeperConnectionDelegate
+
+// Connected is called when an existing auth token is found
+- (void)connected
+{
+    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connected" 
+                                                     message:@"Running Intensity is linked to your RunKeeper account"
+                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+    [alert show];
+}
+
+// Called when the request to connect to runkeeper failed
+- (void)connectionFailed:(NSError*)err
+{
+    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connection Failed" 
+                                                     message:@"The link to your RunKeeper account failed."
+                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+    [alert show];
+}
+
+// Called when authentication is needed to connect to RunKeeper --- normally, the client app will call
+// tryToAuthorize at this point
+- (void)needsAuthentication
+{
+    [[RunKeeper sharedRunKeeper] tryToAuthorize];
+}
+
 
 /*
  // Override to allow orientations other than the default portrait orientation.
