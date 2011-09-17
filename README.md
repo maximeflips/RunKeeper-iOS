@@ -1,20 +1,19 @@
-# BRBitly
+# RunKeeper-iOS
 
-BRBitly provides an Objective C wrapper class for accessing the free URL shortening services at [bit.ly](http://www.bitly.com) from iOS 4.0 or newer.
+RunKeeper-iOS provides an Objective C wrapper class for accessing the [RunKeeper Health Graph API](http://developer.runkeeper.com/healthgraph) from iOS 4.0 or newer.
 
-# Disclosure
-
-BRBitly was rather brazenly copied and adapted from [ILBitly](https://github.com/InfiniteLoopDK/ILBitly.git).  I wanted to use ILBitly directly, but the existing project was already built around ASI and SBJson rather than AFNetwork and JSONkit, so I adapted it to my needs.
+RunKeeper-iOS was developed for use in our iPhone fitness app "Running Intensity".  It is meant to be general, but is built primarily for a Running app.
 
 ## Dependencies
 
 - [ASI HTTP Request](https://github.com/pokeb/asi-http-request) - Used for the underlying network access
 - [SBJson](https://github.com/stig/json-framework.git) - Needed for parsing the response from bit.ly
-- You will also need an account at bit.ly including an [API key](http://bitly.com/a/your_api_key)
+- [OAuth2Client](https://github.com/nxtbgthng/OAuth2Client) - Used for OAuth2 access to RunKeeper API
+- You will also need to register for a RunKeeper account, create an app, and get your tokens
 
 
 ## Example Usage
-###Shortening an URL
+###Posting a Run
 	BRBitly *bitly = [[BRBitly alloc] initWithLogin:login apiKey:apiKey];
 	[bitly shorten:@"http://www.infinite-loop.dk" result:^(NSString *shortURLString) {
 		NSLog(@"The shortened URL: %@", shortURLString);
@@ -23,28 +22,12 @@ BRBitly was rather brazenly copied and adapted from [ILBitly](https://github.com
 	}];
 	[bitly release];
 
-###Expanding an URL
-	[bitly expand:@"http://j.mp/its-your-round" result:^(NSString *longURLString) {
-		NSLog(@"The expanded URL: %@", longURLString);
-	} error:^(NSError *err) {
-		NSLog(@"An error occurred %@", err);
-	}];
-
-###Getting statistics on number of clicks
-	[bitly clicks:@"http://j.mp/qnpNBs" result:^(NSInteger userClicks, NSInteger globalClicks) {
-		NSLog(@"This link has been clicked %d times out of %d clicks globally: %d", userClicks, globalClicks);
-	} error:^(NSError *err) {
-		NSLog(@"An error occurred %@", err);
-	}];
-
 
 See more examples in the attached sample project.
 
-## Building Xcode Documentation
+## Getting Started
 
-BRBitly is documented in the header files using the appledoc syntax. The sample app contains a target called "Documentation" which will build the documentation and install it for use inside Xcode as a searchable and browsable docset.
-In order to be able to build it you will need to install appledoc on your own computer. You can get appledoc from [GitHub](https://github.com/tomaz/appledoc).
-For more information about how to setup and build the documentation you can read this [short tutorial](http://wp.me/p1xKtH-52).
+Check out the sample app to see a very simple integration.
 
 Feel free to add enhanchements, bug fixes, changes and provide them back to the community!
 

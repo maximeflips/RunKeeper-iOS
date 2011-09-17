@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'runkeepersampleTests' target in the 'runkeepersampleTests' project
+//
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+#endif
