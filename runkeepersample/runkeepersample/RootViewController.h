@@ -7,9 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 #import "RunKeeper.h"
 
-@interface RootViewController : UIViewController <RunKeeperConnectionDelegate> {
+typedef enum {
+    kStopped,
+    kRunning,
+    kPaused,
+} ActivityState;
+
+
+@interface RootViewController : UIViewController <RunKeeperConnectionDelegate, CLLocationManagerDelegate> {
+    CLLocationManager *locationManager;
+    ActivityState state;
+    UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
 }
 
 @property (nonatomic, retain) IBOutlet UILabel *progressLabel;

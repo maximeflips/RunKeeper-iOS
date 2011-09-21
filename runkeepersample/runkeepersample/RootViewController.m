@@ -18,11 +18,13 @@
     RunKeeper *rk = [AppData sharedAppData].runKeeper;
     self.connectButton.enabled = !rk.connected;
     self.disconnectButton.hidden = !rk.connected;
+    self.pauseButton.hidden = YES;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    state = kStopped;
     self.title = @"RunKeeper Sample";
     self.progressLabel.text = @"Touch start to begin";
     [self updateViews];
@@ -50,12 +52,34 @@
 
 - (IBAction)toggleStart
 {
-    
+    if (state == kStopped) {
+        locationManager = [[CLLocationManager alloc] init];
+        locationManager.delegate = self;
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        locationManager.distanceFilter = 0.0;
+        [locationManager startUpdatingLocation];  
+        state = kRunning;
+        [self.startButton setTitle:@"STOP" forState:UIControlStateNormal];
+        self.pauseButton.hidden = NO;
+    } else if (state == kRunning) {
+        [locationManager stopUpdatingLocation];
+        [locationManager release];
+        locationManager = nil;
+        state = kStopped;
+        [self.startButton setTitle:@"START" forState:UIControlStateNormal];
+        self.pauseButton.hidden = YES;
+    }
 }
 
 - (IBAction)togglePause
 {
-    
+    if (state == kRunning) {
+        state = kPaused;
+        [self.pauseButton setTitle:@"RESUME" forState:UIControlStateNormal];
+    } else if (state == kPaused) {
+        state = kRunning;
+        [self.pauseButton setTitle:@"PAUSE" forState:UIControlStateNormal];
+    }
 }
 
 - (IBAction)connectToRunKeeper
@@ -67,6 +91,16 @@
 {
     [[AppData sharedAppData].runKeeper disconnect];
     [self updateViews];
+    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Disconnect" 
+                                                     message:@"Running Intensity is no longer linked to your RunKeeper account"
+                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+    [alert show];
+}
+
+#pragma mark CLLocationDelegate
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+    
 }
 
 #pragma mark RunKeeperConnectionDelegate
@@ -123,6 +157,7 @@
     self.startButton = nil;
     self.disconnectButton = nil;
     self.pauseButton = nil;
+    self.connectButton = nil;
 
     // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
     // For example: self.myOutlet = nil;
@@ -135,6 +170,11 @@
     [self.startButton release];
     [self.pauseButton release];
     [self.disconnectButton release];
+    [self.connectButton release];
+    if (locationManager) {
+        [locationManager stopUpdatingLocation];
+        [locationManager release];
+    }
 }
 
 @end
