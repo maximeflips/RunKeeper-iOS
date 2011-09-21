@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface runkeepersampleAppDelegate : NSObject <UIApplicationDelegate> {
 
+@interface runkeepersampleAppDelegate : NSObject <UIApplicationDelegate> {
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;

@@ -7,16 +7,25 @@
 //
 
 #import "RootViewController.h"
+#import "AppData.h"
 
 @implementation RootViewController
 
-@synthesize progressLabel, startButton, pauseButton;
+@synthesize progressLabel, startButton, pauseButton, disconnectButton, connectButton;
+
+- (void)updateViews
+{
+    RunKeeper *rk = [AppData sharedAppData].runKeeper;
+    self.connectButton.enabled = !rk.connected;
+    self.disconnectButton.hidden = !rk.connected;
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.title = @"RunKeeper Sample";
     self.progressLabel.text = @"Touch start to begin";
+    [self updateViews];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -51,7 +60,13 @@
 
 - (IBAction)connectToRunKeeper
 {
-    
+    [[AppData sharedAppData].runKeeper tryToConnect:self];
+}
+
+- (IBAction)disconnect
+{
+    [[AppData sharedAppData].runKeeper disconnect];
+    [self updateViews];
 }
 
 #pragma mark RunKeeperConnectionDelegate
@@ -59,15 +74,18 @@
 // Connected is called when an existing auth token is found
 - (void)connected
 {
+    [self updateViews];
     UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connected" 
                                                      message:@"Running Intensity is linked to your RunKeeper account"
                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
     [alert show];
+    
 }
 
 // Called when the request to connect to runkeeper failed
 - (void)connectionFailed:(NSError*)err
 {
+    [self updateViews];
     UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connection Failed" 
                                                      message:@"The link to your RunKeeper account failed."
                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
@@ -78,7 +96,7 @@
 // tryToAuthorize at this point
 - (void)needsAuthentication
 {
-    [[RunKeeper sharedRunKeeper] tryToAuthorize];
+    [[AppData sharedAppData].runKeeper tryToAuthorize];
 }
 
 
@@ -103,6 +121,8 @@
     [super viewDidUnload];
     self.progressLabel = nil;
     self.startButton = nil;
+    self.disconnectButton = nil;
+    self.pauseButton = nil;
 
     // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
     // For example: self.myOutlet = nil;
@@ -113,6 +133,8 @@
     [super dealloc];
     [self.progressLabel release];
     [self.startButton release];
+    [self.pauseButton release];
+    [self.disconnectButton release];
 }
 
 @end

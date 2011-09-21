@@ -8,9 +8,7 @@
 
 #import "runkeepersampleAppDelegate.h"
 #import "RunKeeper.h"
-
-#define kRunKeeperClientID @"055cac1c950b46e6ac7910d62800a854"
-#define kRunKeeperClientSecret @"fecafee9ecfa43fab1dc25fb883066fb"
+#import "AppData.h"
 
 @implementation runkeepersampleAppDelegate
 
@@ -23,14 +21,12 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
     
-    [[RunKeeper sharedRunKeeper] handleOpenURL:url];
+    [[AppData sharedAppData].runKeeper handleOpenURL:url];
     return TRUE;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [[RunKeeper sharedRunKeeper] setClientID:kRunKeeperClientID clientSecret:kRunKeeperClientSecret];
-    [[RunKeeper sharedRunKeeper] tryToConnect:nil];
     // Override point for customization after application launch.
     // Add the navigation controller's view to the window and display.
     self.window.rootViewController = self.navigationController;

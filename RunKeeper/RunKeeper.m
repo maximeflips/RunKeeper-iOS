@@ -7,7 +7,6 @@
 //
 
 #import "RunKeeper.h"
-#import "SynthesizeSingleton.h"
 #import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
 #import "SBJson.h"
@@ -50,12 +49,15 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
 @synthesize oauthClient, connected, paths, userID;
 @synthesize clientID, clientSecret;
 
-SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
-
-- (void)setClientID:(NSString*)_clientID clientSecret:(NSString*)secret
+- (id)initWithClientID:(NSString*)_clientID clientSecret:(NSString*)secret
 {
-    self.clientID = _clientID;
-    self.clientSecret = secret;
+    self = [super init];
+    if (self) {
+        self.clientID = _clientID;
+        self.clientSecret = secret;
+        connected = self.oauthClient.accessToken != nil;
+    }
+    return self;
 }
 
 - (void)tryToConnect:(id <RunKeeperConnectionDelegate>)_delegate;
@@ -64,9 +66,15 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(RunKeeper);
     [self.oauthClient requestAccess];
 }
 
+- (void)disconnect
+{
+    self.oauthClient.accessToken = nil;
+    connected = NO;
+}
+
 - (void)tryToAuthorize
 {
-    NSString *oauth_path = [NSString stringWithFormat:@"rk%@", self.clientID];
+    NSString *oauth_path = [NSString stringWithFormat:@"rk%@://oauth2", self.clientID];
     NSURL *authorizationURL = [self.oauthClient authorizationURLWithRedirectURL:[NSURL URLWithString:oauth_path]];
     [[UIApplication sharedApplication] openURL:authorizationURL];
 }

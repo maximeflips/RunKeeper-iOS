@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		63077884142987D400E1ECD4 /* AppData.m in Sources */ = {isa = PBXBuildFile; fileRef = 63077883142987D300E1ECD4 /* AppData.m */; };
 		63C1FBB41424230F0074CF99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FBB31424230F0074CF99 /* UIKit.framework */; };
 		63C1FBB61424230F0074CF99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FBB51424230F0074CF99 /* Foundation.framework */; };
 		63C1FBB81424230F0074CF99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FBB71424230F0074CF99 /* CoreGraphics.framework */; };
@@ -76,6 +77,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		63077882142987D300E1ECD4 /* AppData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppData.h; sourceTree = "<group>"; };
+		63077883142987D300E1ECD4 /* AppData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppData.m; sourceTree = "<group>"; };
 		63C1FBAF1424230F0074CF99 /* runkeepersample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = runkeepersample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		63C1FBB31424230F0074CF99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		63C1FBB51424230F0074CF99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -266,6 +269,8 @@
 				63C1FBC91424230F0074CF99 /* RootViewController.m */,
 				63C1FBCB1424230F0074CF99 /* RootViewController.xib */,
 				63C1FBBA1424230F0074CF99 /* Supporting Files */,
+				63077882142987D300E1ECD4 /* AppData.h */,
+				63077883142987D300E1ECD4 /* AppData.m */,
 			);
 			path = runkeepersample;
 			sourceTree = "<group>";
@@ -575,6 +580,7 @@
 				63C1FC591424261C0074CF99 /* NXOAuth2PostBodyStream.m in Sources */,
 				63C1FC5D142426750074CF99 /* Reachability.m in Sources */,
 				63C1FC79142435AC0074CF99 /* RunKeeper.m in Sources */,
+				63077884142987D400E1ECD4 /* AppData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -755,6 +761,7 @@
 				63C1FBE81424230F0074CF99 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		63C1FBE91424230F0074CF99 /* Build configuration list for PBXNativeTarget "runkeepersampleTests" */ = {
 			isa = XCConfigurationList;
@@ -763,6 +770,7 @@
 				63C1FBEB1424230F0074CF99 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

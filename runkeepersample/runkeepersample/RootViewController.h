@@ -10,15 +10,15 @@
 #import "RunKeeper.h"
 
 @interface RootViewController : UIViewController <RunKeeperConnectionDelegate> {
-
 }
 
 @property (nonatomic, retain) IBOutlet UILabel *progressLabel;
-@property (nonatomic, retain) IBOutlet UIButton *startButton, *pauseButton;
+@property (nonatomic, retain) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
 
 - (IBAction)toggleStart;
 - (IBAction)togglePause;
 - (IBAction)connectToRunKeeper;
+- (IBAction)disconnect;
 
 
 @end

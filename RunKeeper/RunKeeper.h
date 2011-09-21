@@ -63,12 +63,24 @@ typedef enum {
 @property (nonatomic, retain) NSDictionary *paths;
 @property (nonatomic, retain) NSNumber *userID;
 
-+ (RunKeeper *)sharedRunKeeper;
+/** @name Connection and Authorization */
 
-- (void)setClientID:(NSString*)clientID clientSecret:(NSString*)secret;
+/** Takes a long URL and returns a shortened version of it.
+ 
+ Takes the long URL specfied in _longURLString_ and returns a shortened version in the block specified in _result_.
+ 
+ In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
+ 
+ @param longURLString The long URL string to shorten
+ @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value
+ @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
+
+- (id)initWithClientID:(NSString*)clientID clientSecret:(NSString*)secret;
 - (void)handleOpenURL:(NSURL *)url;
 - (void)tryToConnect:(id <RunKeeperConnectionDelegate>)delegate;
 - (void)tryToAuthorize;
+- (void)disconnect;
+
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
                  duration:(NSNumber*)duration calories:(NSNumber*)calories heartRate:(NSNumber*)heartRate
                     notes:(NSString*)notes path:(NSArray*)path
