@@ -30,7 +30,7 @@ typedef enum {
 }
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
-@property (nonatomic, retain) NSDate *startTime, *endTime;
+@property (nonatomic, retain) NSDate *beginTime, *startTime, *endTime;
 @property (nonatomic, retain) NSTimer *tickTimer;
 @property (nonatomic, retain) IBOutlet UILabel *progressLabel;
 @property (nonatomic, retain) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;

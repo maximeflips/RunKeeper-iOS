@@ -33,7 +33,7 @@
 @implementation RootViewController
 
 @synthesize progressLabel, startButton, pauseButton, disconnectButton, connectButton;
-@synthesize tickTimer, startTime, endTime, locationManager;
+@synthesize tickTimer, startTime, endTime, beginTime, locationManager;
 
 - (void)updateViews
 {
@@ -82,8 +82,8 @@
 {
     if (buttonIndex == 1) {
         RunKeeper *rk = [AppData sharedAppData].runKeeper;
-        [rk postActivity:kRKRunning start:[NSDate date] 
-                distance:[NSNumber numberWithFloat:10000]
+        [rk postActivity:kRKRunning start:self.beginTime 
+                distance:nil
                 duration:[NSNumber numberWithFloat:[self.endTime timeIntervalSinceDate:self.startTime] + elapsedTime]
                 calories:nil 
                heartRate:nil 
@@ -112,6 +112,7 @@
         state = kRunning;
         elapsedTime = 0;
         self.startTime = [NSDate date];
+        self.beginTime = self.startTime;
         [self.startButton setTitle:@"STOP" forState:UIControlStateNormal];
         self.pauseButton.hidden = NO;
         RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKStartPoint] autorelease];
@@ -124,6 +125,7 @@
         [tickTimer invalidate];
         self.tickTimer = nil;
         self.endTime = [NSDate date];
+        elapsedTime += [self.endTime timeIntervalSinceDate:self.startTime];
         RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKEndPoint] autorelease];
         [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification  object:point];
         UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Upload?" 

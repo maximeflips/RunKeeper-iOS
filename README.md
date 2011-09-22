@@ -73,6 +73,22 @@ In your application delegate:
     return TRUE;
   }
   ```
+
+### Authorize the User
+
+You begin by trying to connect to RunKeeper.  If the user previously authorized the app and the access token, is still available, the connection will happen immediately and without any intervention:
+
+  ```
+  [[AppData sharedAppData].runKeeper tryToConnect:self];
+  ```
+  
+If the user has not granted authorization OR the access token has been lost/deleted, your delegate method `needsAuthentication` will be called.  In this method, you can request authorization via OAuth.
+
+  ```
+  - (void)needsAuthentication {
+    [[AppData sharedAppData].runKeeper tryToAuthorize];
+  }
+  ```
   
 ## More Info
 
