@@ -18,11 +18,14 @@ RunKeeper-iOS was developed for use in our iPhone fitness app "Running Intensity
 
 The RunKeeper will automatically create a correctly timestamped path for you if you post notifications.
 
-  ```RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:newLocation ofType:kRKGPSPoint] autorelease];
-  [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification object:point];```
+  ```
+  RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:newLocation ofType:kRKGPSPoint] autorelease];
+  [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification object:point];
+  ```
         
 ### Posting a Run
-  ```[self.runKeeper postActivity:kRKRunning start:[NSDate date] 
+  ```
+  [self.runKeeper postActivity:kRKRunning start:[NSDate date] 
                 distance:[NSNumber numberWithFloat:10000]
                 duration:[NSNumber numberWithFloat:[self.endTime timeIntervalSinceDate:self.startTime] + elapsedTime]
                 calories:nil 
@@ -42,7 +45,8 @@ The RunKeeper will automatically create a correctly timestamped path for you if 
                                                                        message:msg
                                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
                       [alert show];
-                  }];```
+                  }];
+    ```
 
 
 
@@ -52,7 +56,9 @@ See more examples in the attached sample project.
 
 ### Create a RunKeeper Instance with your Secret Keys
 
-  ```self.runKeeper = [[[RunKeeper alloc] initWithClientID:kRunKeeperClientID clientSecret:kRunKeeperClientSecret] autorelease];```
+  ```
+  self.runKeeper = [[[RunKeeper alloc] initWithClientID:kRunKeeperClientID clientSecret:kRunKeeperClientSecret] autorelease];
+  ```
   
 ### Register a URL Scheme
 
@@ -62,11 +68,13 @@ Your URL Scheme is constructed by taking your RunKeeper ClientID and prepending 
 
 In your application delegate:
 
-  ```- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+  ```
+  - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
     
     [self.runKeeper handleOpenURL:url];
     return TRUE;
-  }```
+  }
+  ```
   
 ## More Info
 
