@@ -76,7 +76,8 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     if (pt.pointType == kRKStartPoint) {
         self.startPointTimestamp = pt.time;
     }
-    assert(self.startPointTimestamp);
+    // If we have not received a start point, then just ignore any of the points
+    if (self.startPointTimestamp == nil) return;
     pt.timeStamp = [pt.time timeIntervalSinceDate:self.startPointTimestamp];
     
     [self.currentPath addObject:pt];
