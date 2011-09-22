@@ -25,7 +25,6 @@
 		63C1FBDE1424230F0074CF99 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBDC1424230F0074CF99 /* InfoPlist.strings */; };
 		63C1FBE11424230F0074CF99 /* runkeepersampleTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBE01424230F0074CF99 /* runkeepersampleTests.h */; };
 		63C1FBE31424230F0074CF99 /* runkeepersampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBE21424230F0074CF99 /* runkeepersampleTests.m */; };
-		63C1FBEE142423E40074CF99 /* PositionTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBEC142423E40074CF99 /* PositionTracker.m */; };
 		63C1FBF1142424CF0074CF99 /* connect-blue-black-300x57.png in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBF0142424CF0074CF99 /* connect-blue-black-300x57.png */; };
 		63C1FC3C1424261C0074CF99 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF41424261B0074CF99 /* NSObject+SBJson.m */; };
 		63C1FC3D1424261C0074CF99 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF71424261B0074CF99 /* SBJsonParser.m */; };
@@ -105,8 +104,6 @@
 		63C1FBDF1424230F0074CF99 /* runkeepersampleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "runkeepersampleTests-Prefix.pch"; sourceTree = "<group>"; };
 		63C1FBE01424230F0074CF99 /* runkeepersampleTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runkeepersampleTests.h; sourceTree = "<group>"; };
 		63C1FBE21424230F0074CF99 /* runkeepersampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = runkeepersampleTests.m; sourceTree = "<group>"; };
-		63C1FBEC142423E40074CF99 /* PositionTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PositionTracker.m; sourceTree = "<group>"; };
-		63C1FBED142423E40074CF99 /* PositionTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PositionTracker.h; sourceTree = "<group>"; };
 		63C1FBF0142424CF0074CF99 /* connect-blue-black-300x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "connect-blue-black-300x57.png"; sourceTree = "<group>"; };
 		63C1FBF31424261B0074CF99 /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJson.h"; sourceTree = "<group>"; };
 		63C1FBF41424261B0074CF99 /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJson.m"; sourceTree = "<group>"; };
@@ -266,8 +263,6 @@
 				63C1FC0C1424261B0074CF99 /* ASI */,
 				63C1FC211424261B0074CF99 /* OAuth2Client */,
 				63C1FBEF142424BE0074CF99 /* Resources */,
-				63C1FBEC142423E40074CF99 /* PositionTracker.m */,
-				63C1FBED142423E40074CF99 /* PositionTracker.h */,
 				63C1FBC21424230F0074CF99 /* runkeepersampleAppDelegate.h */,
 				63C1FBC31424230F0074CF99 /* runkeepersampleAppDelegate.m */,
 				63C1FBC51424230F0074CF99 /* MainWindow.xib */,
@@ -557,7 +552,6 @@
 				63C1FBC11424230F0074CF99 /* main.m in Sources */,
 				63C1FBC41424230F0074CF99 /* runkeepersampleAppDelegate.m in Sources */,
 				63C1FBCA1424230F0074CF99 /* RootViewController.m in Sources */,
-				63C1FBEE142423E40074CF99 /* PositionTracker.m in Sources */,
 				63C1FC3C1424261C0074CF99 /* NSObject+SBJson.m in Sources */,
 				63C1FC3D1424261C0074CF99 /* SBJsonParser.m in Sources */,
 				63C1FC3E1424261C0074CF99 /* SBJsonStreamParser.m in Sources */,
