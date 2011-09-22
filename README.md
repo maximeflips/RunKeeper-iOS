@@ -46,9 +46,7 @@ The RunKeeper will automatically create a correctly timestamped path for you if 
                                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
                       [alert show];
                   }];
-    ```
-
-
+  ```
 
 See more examples in the attached sample project.
 
