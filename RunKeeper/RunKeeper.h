@@ -11,9 +11,7 @@
 
 typedef void(^RIBasicCompletionBlock)(void);
 typedef void(^RIJSONCompletionBlock)(id json);
-typedef void(^RINSStringCompletionBlock)(NSString *msg);
-typedef void(^RIBasicFailedBlock)(void);
-typedef void(^RIErrorDictFailedBlock)(NSDictionary *errors);
+typedef void(^RIBasicFailedBlock)(NSError *err);
 
 typedef enum {
     kRKRunning,
@@ -32,6 +30,9 @@ typedef enum {
     kRKOther
 } RunKeeperActivityType;
 
+// 
+
+
 @protocol RunKeeperConnectionDelegate <NSObject>
 
 @optional
@@ -46,6 +47,8 @@ typedef enum {
 - (void)needsAuthentication;
 @end
 
+extern NSString *const kRunKeeperNewPointNotification;
+
 @interface RunKeeper : NSObject <NXOAuth2ClientDelegate> {
     
 @private
@@ -57,11 +60,13 @@ typedef enum {
     id <RunKeeperConnectionDelegate> delegate;
 }
 
+@property (nonatomic, retain) NSDate *startPointTimestamp;
 @property (nonatomic, retain) NSString *clientID, *clientSecret;
 @property (nonatomic, retain, readonly) NXOAuth2Client *oauthClient;
 @property (nonatomic, readonly) BOOL connected;
 @property (nonatomic, retain) NSDictionary *paths;
 @property (nonatomic, retain) NSNumber *userID;
+@property (nonatomic, retain) NSMutableArray *currentPath;
 
 /** @name Connection and Authorization */
 

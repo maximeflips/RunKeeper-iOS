@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		63077884142987D400E1ECD4 /* AppData.m in Sources */ = {isa = PBXBuildFile; fileRef = 63077883142987D300E1ECD4 /* AppData.m */; };
+		6312935A142ADA8500BEFB57 /* RunKeeperPathPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 63129359142ADA8500BEFB57 /* RunKeeperPathPoint.m */; };
+		63B65AA9142A5FA400BA4D63 /* NSDate+SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B65AA7142A5FA400BA4D63 /* NSDate+SBJSON.m */; };
 		63C1FBB41424230F0074CF99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FBB31424230F0074CF99 /* UIKit.framework */; };
 		63C1FBB61424230F0074CF99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FBB51424230F0074CF99 /* Foundation.framework */; };
 		63C1FBB81424230F0074CF99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FBB71424230F0074CF99 /* CoreGraphics.framework */; };
@@ -79,6 +81,10 @@
 /* Begin PBXFileReference section */
 		63077882142987D300E1ECD4 /* AppData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppData.h; sourceTree = "<group>"; };
 		63077883142987D300E1ECD4 /* AppData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppData.m; sourceTree = "<group>"; };
+		63129358142ADA8500BEFB57 /* RunKeeperPathPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunKeeperPathPoint.h; sourceTree = "<group>"; };
+		63129359142ADA8500BEFB57 /* RunKeeperPathPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunKeeperPathPoint.m; sourceTree = "<group>"; };
+		63B65AA7142A5FA400BA4D63 /* NSDate+SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+SBJSON.m"; sourceTree = "<group>"; };
+		63B65AA8142A5FA400BA4D63 /* NSDate+SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+SBJSON.h"; sourceTree = "<group>"; };
 		63C1FBAF1424230F0074CF99 /* runkeepersample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = runkeepersample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		63C1FBB31424230F0074CF99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		63C1FBB51424230F0074CF99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -429,9 +435,13 @@
 		63C1FC76142435AC0074CF99 /* RunKeeper */ = {
 			isa = PBXGroup;
 			children = (
+				63B65AA7142A5FA400BA4D63 /* NSDate+SBJSON.m */,
+				63B65AA8142A5FA400BA4D63 /* NSDate+SBJSON.h */,
 				63C1FC77142435AC0074CF99 /* RunKeeper.h */,
 				63C1FC78142435AC0074CF99 /* RunKeeper.m */,
 				63C1FC7A142435D00074CF99 /* RunKeeperErrors.strings */,
+				63129358142ADA8500BEFB57 /* RunKeeperPathPoint.h */,
+				63129359142ADA8500BEFB57 /* RunKeeperPathPoint.m */,
 			);
 			name = RunKeeper;
 			path = ../../RunKeeper;
@@ -581,6 +591,8 @@
 				63C1FC5D142426750074CF99 /* Reachability.m in Sources */,
 				63C1FC79142435AC0074CF99 /* RunKeeper.m in Sources */,
 				63077884142987D400E1ECD4 /* AppData.m in Sources */,
+				63B65AA9142A5FA400BA4D63 /* NSDate+SBJSON.m in Sources */,
+				6312935A142ADA8500BEFB57 /* RunKeeperPathPoint.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

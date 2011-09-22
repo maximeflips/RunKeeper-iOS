@@ -10,6 +10,12 @@
 #import <CoreLocation/CoreLocation.h>
 #import "RunKeeper.h"
 
+@interface NSString (NSString_TimeInterval)
+
++ (NSString*)stringWithTimeInterval:(NSTimeInterval)interval tenths:(BOOL)tenths;
+
+@end
+
 typedef enum {
     kStopped,
     kRunning,
@@ -17,12 +23,15 @@ typedef enum {
 } ActivityState;
 
 
-@interface RootViewController : UIViewController <RunKeeperConnectionDelegate, CLLocationManagerDelegate> {
-    CLLocationManager *locationManager;
+@interface RootViewController : UIViewController 
+    <RunKeeperConnectionDelegate, CLLocationManagerDelegate, UIAlertViewDelegate> {
     ActivityState state;
-    UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
+    NSTimeInterval elapsedTime;
 }
 
+@property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, retain) NSDate *startTime, *endTime;
+@property (nonatomic, retain) NSTimer *tickTimer;
 @property (nonatomic, retain) IBOutlet UILabel *progressLabel;
 @property (nonatomic, retain) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
 

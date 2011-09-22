@@ -7,6 +7,7 @@
 //
 
 #import "RunKeeper.h"
+#import "RunKeeperPathPoint.h"
 #import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
 #import "SBJson.h"
@@ -18,6 +19,8 @@
 
 #define kRunKeeperBasePath @"https://api.runkeeper.com"
 #define kRunKeeperBaseURL @"/user/"
+
+#define kNotConnectedErrorCode 100
 
 #define kRKBackgroundActivitiesKey        @"background_activities"
 #define kRKDiabetesKey                    @"diabetes"
@@ -33,13 +36,16 @@
 #define kRKUserIDKey                      @"userID"
 #define kRKWeightKey                      @"weight"
 
-NSString *const kBRBitlyErrorDomain = @"RunKeeperErrorDomain";
-NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
+NSString *const kRunKeeperErrorDomain = @"RunKeeperErrorDomain";
+NSString *const kRunKeeperStatusTextKey = @"RunKeeperStatusText";
+NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification";
+
 
 @interface RunKeeper()
 
 - (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt;
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
+- (void)newPathPoint:(NSNotification*)note;
 
 @end
 
@@ -48,6 +54,7 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
 
 @synthesize oauthClient, connected, paths, userID;
 @synthesize clientID, clientSecret;
+@synthesize currentPath, startPointTimestamp;
 
 - (id)initWithClientID:(NSString*)_clientID clientSecret:(NSString*)secret
 {
@@ -56,8 +63,23 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
         self.clientID = _clientID;
         self.clientSecret = secret;
         connected = self.oauthClient.accessToken != nil;
+        self.currentPath = [NSMutableArray array];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newPathPoint:) 
+                                                     name:kRunKeeperNewPointNotification object:nil];
     }
     return self;
+}
+
+- (void)newPathPoint:(NSNotification*)note
+{
+    RunKeeperPathPoint *pt = [note object];
+    if (pt.pointType == kRKStartPoint) {
+        self.startPointTimestamp = pt.time;
+    }
+    assert(self.startPointTimestamp);
+    pt.timeStamp = [pt.time timeIntervalSinceDate:self.startPointTimestamp];
+    
+    [self.currentPath addObject:pt];
 }
 
 - (void)tryToConnect:(id <RunKeeperConnectionDelegate>)_delegate;
@@ -94,11 +116,11 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
 
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status {
 	NSMutableDictionary *userDict = [NSMutableDictionary dictionary];
-	[userDict setObject:status forKey:kBRBitlyStatusTextKey];
+	[userDict setObject:status forKey:kRunKeeperStatusTextKey];
 	status = [self localizedStatusText:status];
 	if(status)
 		[userDict setObject:status forKey:NSLocalizedDescriptionKey];
-	NSError *bitlyError = [NSError errorWithDomain:kBRBitlyErrorDomain code:code userInfo:userDict];
+	NSError *bitlyError = [NSError errorWithDomain:kRunKeeperErrorDomain code:code userInfo:userDict];
     
 	return bitlyError;
 }
@@ -114,17 +136,17 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
 
 - (ASIHTTPRequest*)createRequest:(NSString*)path {
     NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
-    NSLog(@"request URL: %@", str);
+    //NSLog(@"request URL: %@", str);
     NSURL *url = [NSURL URLWithString:str];
     return [self createStandardRequest:url];
 }
 
-- (ASIFormDataRequest*)createPostRequest:(NSString*)path content:(NSString*)content {
+- (ASIFormDataRequest*)createPostRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType {
     NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
     NSURL *url = [NSURL URLWithString:str];
     ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
     [request addRequestHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
-    [request addRequestHeader:@"Content-Type" value:@"application/vnd.com.runkeeper.NewFitnessActivity+json"];
+    [request addRequestHeader:@"Content-Type" value:contentType];
     request.delegate = self;
     //[request setPostBody:[content dataUsingEncoding:NSUTF8StringEncoding]];
     NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
@@ -147,14 +169,14 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
     }];
     [request setFailedBlock:^{
         NSLog(@"*** request failed reason: %@", [request error]);
-        if (failed) failed();
+        if (failed) failed([request error]);
     }];
     [request startAsynchronous];
     return request;
 }
 
-- (ASIHTTPRequest*)postRequest:(NSString*)path content:(NSString*)content onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __block ASIFormDataRequest *request = [self createPostRequest:path content:content];    
+- (ASIHTTPRequest*)postRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
+    __block ASIFormDataRequest *request = [self createPostRequest:path content:content contentType:content];    
     
     [request setCompletionBlock:^{
         // Use when fetching text data
@@ -165,13 +187,14 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
                 //completion([[request responseString] JSONValue]);
             }
         } else {
+            NSError *err = [self errorWithCode:[request responseStatusCode] status:[request responseString]];
             NSLog(@"postFailed: %d %@", [request responseStatusCode], [request responseString]);
-            if (failed) failed();
+            if (failed) failed(err);
         }
     }];
     [request setFailedBlock:^{
         NSLog(@"*** request failed reason: %@", [request error]);
-        if (failed) failed();
+        if (failed) failed([request error]);
     }];
     [request startAsynchronous];
     return request;
@@ -183,11 +206,14 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
     [self request:kRunKeeperBaseURL onCompletion:^(id json) {
         self.paths = json;
         self.userID = [self.paths objectForKey:@"kRKUserIDKey"];
-    } onFailed:^{
+    } onFailed:^(NSError *err){
         self.paths = nil;
         self.userID = nil;
         connected = NO;
-        NSLog(@"fail: ");
+        UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"RunKeeper ERror" 
+                                                         message:@"Error while communication with RunKeeper."
+                                                        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+        [alert show];
     }];
 }
 
@@ -219,31 +245,9 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
                     notes:(NSString*)notes path:(NSArray*)path
              success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed
 {
-    /*
-    {
-        "type": "Running",
-        "start_time": "Sat, 1 Jan 2011 00:00:00",
-        "notes": "My first late-night run", "path": [{"timestamp":0,
-            "altitude":0,
-            "longitude":-70.95182336425782,
-            "latitude":42.312620297384676,
-            "type":"start"},
-        {"timestamp":8,
-            "altitude":0,
-            "longitude":-70.95255292510987,
-            "latitude":42.31230294498018,
-            "type":"end"}]
-        "post_to_facebook": true,
-        "post_to_twitter": true
-    }*/
-    /**
-     [[RunKeeper sharedRunKeeper] postActivity:kRKRunning start:[NSDate date] 
-     distance:[NSNumber numberWithFloat:10000]
-     duration:[NSNumber numberWithInt:3600]
-     calories:nil heartRate:nil notes:@"Good to go" path:nil];
-     */
     if (!connected) {
-        if (failed) failed();
+        NSError *err = [self errorWithCode:kNotConnectedErrorCode status:@"You are not connected to RunKeeper"];
+        if (failed) failed(err);
         return;
     }
     NSDictionary *args = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -255,13 +259,13 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
                           path, @"path",
                           nil];
     NSString *content = [args JSONRepresentation];
-    NSLog(@"content: %@", content);
-    [self postRequest:[self.paths objectForKey:kRKFitnessActivitiesKey] content:content  onCompletion:^(id json) {
-        if (success) success();
-    }onFailed:^{
-        NSLog(@"fail: ");
-        if (failed) failed();
-    }];
+    //NSLog(@"content: %@", content);
+    [self postRequest:[self.paths objectForKey:kRKFitnessActivitiesKey] content:content
+        contentType:@"application/vnd.com.runkeeper.NewFitnessActivity+json" 
+         onCompletion:^(id json) {
+             if (success) success();
+         }
+        onFailed:failed];
 }
 
 #pragma mark NXOAuth2ClientDelegate
@@ -320,6 +324,7 @@ NSString *const kBRBitlyStatusTextKey = @"RunKeeperStatusText";
 #pragma mark Memory management
 
 - (void)dealloc {	
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [oauthClient release];
     [paths release];
     [userID release];

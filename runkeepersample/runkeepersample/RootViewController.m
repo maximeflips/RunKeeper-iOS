@@ -8,10 +8,32 @@
 
 #import "RootViewController.h"
 #import "AppData.h"
+#import "RunKeeperPathPoint.h"
+
+@implementation NSString (NSString_TimeInterval)
+
+
++ (NSString*)stringWithTimeInterval:(NSTimeInterval)interval tenths:(BOOL)tenths {
+	// FIXME support hours as well
+	
+	if (tenths) {
+		int t = interval*10.0;
+		return [NSString stringWithFormat:@"%d:%.2d.%.1d", t/600, (t%600)/10, (t%600)%10];
+	}
+	
+	int t = interval;
+	return [NSString stringWithFormat:@"%d:%.2d", t/60, t%60];
+}
+
+
+
+@end
+
 
 @implementation RootViewController
 
 @synthesize progressLabel, startButton, pauseButton, disconnectButton, connectButton;
+@synthesize tickTimer, startTime, endTime, locationManager;
 
 - (void)updateViews
 {
@@ -28,6 +50,12 @@
     self.title = @"RunKeeper Sample";
     self.progressLabel.text = @"Touch start to begin";
     [self updateViews];
+    
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    self.locationManager.distanceFilter = 0.0;
+    [self.locationManager startUpdatingLocation]; 
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -50,24 +78,60 @@
 	[super viewDidDisappear:animated];
 }
 
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        RunKeeper *rk = [AppData sharedAppData].runKeeper;
+        [rk postActivity:kRKRunning start:[NSDate date] 
+                distance:[NSNumber numberWithFloat:10000]
+                duration:[NSNumber numberWithFloat:[self.endTime timeIntervalSinceDate:self.startTime] + elapsedTime]
+                calories:nil 
+               heartRate:nil 
+                   notes:@"What a great workout!" 
+                    path:rk.currentPath
+                 success:^{
+                     UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Success" 
+                                                                      message:@"Your activity was posted to your RunKeeper account."
+                                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                     [alert show];
+                     
+                 }
+                  failed:^(NSError *err){
+                      NSString *msg = [NSString stringWithFormat:@"Upload to RunKeeper failed: %@", [err localizedDescription]]; 
+                      UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Failed" 
+                                                                       message:msg
+                                                                      delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                      [alert show];
+                  }];
+    }
+}
+
 - (IBAction)toggleStart
 {
     if (state == kStopped) {
-        locationManager = [[CLLocationManager alloc] init];
-        locationManager.delegate = self;
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        locationManager.distanceFilter = 0.0;
-        [locationManager startUpdatingLocation];  
         state = kRunning;
+        elapsedTime = 0;
+        self.startTime = [NSDate date];
         [self.startButton setTitle:@"STOP" forState:UIControlStateNormal];
         self.pauseButton.hidden = NO;
-    } else if (state == kRunning) {
-        [locationManager stopUpdatingLocation];
-        [locationManager release];
-        locationManager = nil;
+        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKStartPoint] autorelease];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification object:point];
+        self.tickTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(tick) userInfo:nil	repeats:YES];
+    } else if ((state == kRunning) || (state == kPaused)) {
         state = kStopped;
         [self.startButton setTitle:@"START" forState:UIControlStateNormal];
         self.pauseButton.hidden = YES;
+        [tickTimer invalidate];
+        self.tickTimer = nil;
+        self.endTime = [NSDate date];
+        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKEndPoint] autorelease];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification  object:point];
+        UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Upload?" 
+                                                         message:@"Would you like to upload your activity to RunKeeper?"
+                                                        delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"OK", nil] autorelease];
+        [alert show];
+        self.progressLabel.text = @"Touch start to begin";
+        
     }
 }
 
@@ -76,9 +140,20 @@
     if (state == kRunning) {
         state = kPaused;
         [self.pauseButton setTitle:@"RESUME" forState:UIControlStateNormal];
+        elapsedTime += [[NSDate date] timeIntervalSinceDate:self.startTime];
+        [tickTimer invalidate];
+        self.tickTimer = nil;
+        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:locationManager.location ofType:kRKPausePoint] autorelease];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification 
+                                                            object:point];
     } else if (state == kPaused) {
         state = kRunning;
         [self.pauseButton setTitle:@"PAUSE" forState:UIControlStateNormal];
+        self.startTime = [NSDate date];
+        self.tickTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(tick) userInfo:nil	repeats:YES];
+        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:locationManager.location ofType:kRKResumePoint] autorelease];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification 
+                                                            object:point];
     }
 }
 
@@ -97,9 +172,20 @@
     [alert show];
 }
 
+- (void)tick {
+	self.progressLabel.text = [NSString stringWithTimeInterval:[[NSDate date] timeIntervalSinceDate:self.startTime] + elapsedTime tenths:NO];
+}
+
 #pragma mark CLLocationDelegate
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation {
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation 
+{
+    //NSLog(@"didUpdateLocation: %@", newLocation);
+    if ((state == kRunning) || (state == kPaused)) {
+        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:newLocation ofType:kRKGPSPoint] autorelease];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification 
+														object:point];
+    }
     
 }
 
@@ -171,6 +257,8 @@
     [self.pauseButton release];
     [self.disconnectButton release];
     [self.connectButton release];
+    [tickTimer invalidate];
+	[tickTimer release];
     if (locationManager) {
         [locationManager stopUpdatingLocation];
         [locationManager release];
