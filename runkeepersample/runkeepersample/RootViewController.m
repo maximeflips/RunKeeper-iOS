@@ -183,8 +183,7 @@
     //NSLog(@"didUpdateLocation: %@", newLocation);
     if ((state == kRunning) || (state == kPaused)) {
         RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:newLocation ofType:kRKGPSPoint] autorelease];
-        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification 
-														object:point];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification object:point];
     }
     
 }

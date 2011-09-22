@@ -92,6 +92,8 @@ extern NSString *const kRunKeeperNewPointNotification;
              success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed;
 
 
+//- (void)getProfile:(
+
 @end
 
 extern NSString *const kRunKeeperErrorDomain;
