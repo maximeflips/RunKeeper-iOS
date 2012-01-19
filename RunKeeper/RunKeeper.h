@@ -9,10 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "NXOAuth2.h"
 
+
+// Some typedefs to make the ugly code slightly less ugly
 typedef void(^RIBasicCompletionBlock)(void);
 typedef void(^RIJSONCompletionBlock)(id json);
 typedef void(^RIBasicFailedBlock)(NSError *err);
 
+
+// All of the activity types supported by the RunKeeper API in a slick little enum
 typedef enum {
     kRKRunning,
     kRKCycling,
@@ -30,9 +34,7 @@ typedef enum {
     kRKOther
 } RunKeeperActivityType;
 
-// 
-
-
+// Here is your protocol if you want to dance with the oauth prom queen
 @protocol RunKeeperConnectionDelegate <NSObject>
 
 @optional
@@ -47,6 +49,8 @@ typedef enum {
 - (void)needsAuthentication;
 @end
 
+/** Use this to post notifications of new path points to be auto-recorded by the RunKeeper API and stored
+ in currentPath --- see the sample app for more details and sample usage. */
 extern NSString *const kRunKeeperNewPointNotification;
 
 @interface RunKeeper : NSObject <NXOAuth2ClientDelegate> {
@@ -83,7 +87,7 @@ extern NSString *const kRunKeeperNewPointNotification;
  existing authorization. */
 - (void)tryToConnect:(id <RunKeeperConnectionDelegate>)delegate;
 
-/** This actually initiates the authorization process --- it is not trigger authomatically since it
+/** This actually initiates the authorization process --- it is not triggered authomatically since it
  may not be appropriate for your application. */
 - (void)tryToAuthorize;
 
@@ -91,6 +95,9 @@ extern NSString *const kRunKeeperNewPointNotification;
  are not actual network calls being made */
 - (void)disconnect;
 
+/** Post an activity to RunKeeper --- will fail unless you are already connected.  Almost all of
+ the parameters are optional -- the only requirements are those of the RunKeeper web API itself which
+ is to provide a start time, activity type, and either the distance or path points. */
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
                  duration:(NSNumber*)duration calories:(NSNumber*)calories avgHeartRate:(NSNumber*)avgHeartRate
                notes:(NSString*)notes path:(NSArray*)path heartRatePoints:(NSArray*)heartRatePoints
