@@ -52,38 +52,43 @@ extern NSString *const kRunKeeperNewPointNotification;
 @interface RunKeeper : NSObject <NXOAuth2ClientDelegate> {
     
 @private
-    NXOAuth2Client *oauthClient; 
-    BOOL connected;
-    NSDictionary *paths;
-    NSNumber *userID;
-    NSString *clientID, *clientSecret;
     id <RunKeeperConnectionDelegate> delegate;
 }
 
+// The timestamp for the starting point --- used to calculate relative times
 @property (nonatomic, retain) NSDate *startPointTimestamp;
-@property (nonatomic, retain) NSString *clientID, *clientSecret;
-@property (nonatomic, retain, readonly) NXOAuth2Client *oauthClient;
+
+
+/** TRUE if RunKeeper API thinks we have a valid connection -- NOTE, we could be wrong.  The API
+ will check for an authorization token at startup and assume it is valid if found.  Otherwise, the connected
+ status will get updated during actual oauth connections or manual disconnects.
+*/
 @property (nonatomic, readonly) BOOL connected;
-@property (nonatomic, retain) NSDictionary *paths;
-@property (nonatomic, retain) NSNumber *userID;
+
+
+/** The currentPath of GPS points which the RunKeeper API has recorded via notifications (if you 
+ decide to use this feature).  You can safely pass this into the postActivity call.
+ */
 @property (nonatomic, retain) NSMutableArray *currentPath;
 
-/** @name Connection and Authorization */
-
-/** Takes a long URL and returns a shortened version of it.
- 
- Takes the long URL specfied in _longURLString_ and returns a shortened version in the block specified in _result_.
- 
- In case of an error the block spefied by _error_ is executed with additional information of the cause of the failure.
- 
- @param longURLString The long URL string to shorten
- @param result The block to execute upon success. The block should take a single NSString* parameter and have no return value
- @param error The block to execute upon failure. The block should take a single NSError* parameter and have no return value*/
-
+/** Create a new client with your shiny credentials and secretz pleeze
+ */
 - (id)initWithClientID:(NSString*)clientID clientSecret:(NSString*)secret;
+
+/** Callback from RunKeeper oauth */
 - (void)handleOpenURL:(NSURL *)url;
+
+/** Try to connect to the RunKeeper API via auth. The delegate will receive callbacks about the status
+ and state of things.  NOTE: this will not actually trigger the authorization flow --- just checks for 
+ existing authorization. */
 - (void)tryToConnect:(id <RunKeeperConnectionDelegate>)delegate;
+
+/** This actually initiates the authorization process --- it is not trigger authomatically since it
+ may not be appropriate for your application. */
 - (void)tryToAuthorize;
+
+/** Disconnect from the RunKeeper API --- all this does is *forget* the authorization token; there
+ are not actual network calls being made */
 - (void)disconnect;
 
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
@@ -92,9 +97,9 @@ extern NSString *const kRunKeeperNewPointNotification;
              success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed;
 
 
-//- (void)getProfile:(
-
 @end
 
+
+// Nothing to see here
 extern NSString *const kRunKeeperErrorDomain;
 extern NSString *const kRunKeeperStatusTextKey;

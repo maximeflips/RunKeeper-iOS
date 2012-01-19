@@ -47,6 +47,13 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
 - (void)newPathPoint:(NSNotification*)note;
 
+@property (nonatomic, retain) NSDictionary *paths;
+@property (nonatomic, retain) NSNumber *userID;
+
+// OAuth stuff
+@property (nonatomic, retain) NSString *clientID, *clientSecret;
+@property (nonatomic, retain, readonly) NXOAuth2Client *oauthClient;
+
 @end
 
 
