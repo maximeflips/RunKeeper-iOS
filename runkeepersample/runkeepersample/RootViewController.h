@@ -29,11 +29,11 @@ typedef enum {
     NSTimeInterval elapsedTime;
 }
 
-@property (nonatomic, retain) CLLocationManager *locationManager;
-@property (nonatomic, retain) NSDate *beginTime, *startTime, *endTime;
-@property (nonatomic, retain) NSTimer *tickTimer;
-@property (nonatomic, retain) IBOutlet UILabel *progressLabel;
-@property (nonatomic, retain) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
+@property (nonatomic, strong) CLLocationManager *locationManager;
+@property (nonatomic, strong) NSDate *beginTime, *startTime, *endTime;
+@property (nonatomic, strong) NSTimer *tickTimer;
+@property (nonatomic, strong) IBOutlet UILabel *progressLabel;
+@property (nonatomic, strong) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
 
 - (IBAction)toggleStart;
 - (IBAction)togglePause;

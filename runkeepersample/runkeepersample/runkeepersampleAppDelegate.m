@@ -21,7 +21,7 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
     
-    [[AppData sharedAppData].runKeeper handleOpenURL:url];
+    [[AppData sharedInstance].runKeeper handleOpenURL:url];
     return TRUE;
 }
 
@@ -73,11 +73,5 @@
      */
 }
 
-- (void)dealloc
-{
-    [_window release];
-    [_navigationController release];
-    [super dealloc];
-}
 
 @end

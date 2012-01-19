@@ -60,7 +60,7 @@ extern NSString *const kRunKeeperNewPointNotification;
 }
 
 // The timestamp for the starting point --- used to calculate relative times
-@property (nonatomic, retain) NSDate *startPointTimestamp;
+@property (nonatomic, strong) NSDate *startPointTimestamp;
 
 
 /** TRUE if RunKeeper API thinks we have a valid connection -- NOTE, we could be wrong.  The API
@@ -73,7 +73,7 @@ extern NSString *const kRunKeeperNewPointNotification;
 /** The currentPath of GPS points which the RunKeeper API has recorded via notifications (if you 
  decide to use this feature).  You can safely pass this into the postActivity call.
  */
-@property (nonatomic, retain) NSMutableArray *currentPath;
+@property (nonatomic, strong) NSMutableArray *currentPath;
 
 /** Create a new client with your shiny credentials and secretz pleeze
  */

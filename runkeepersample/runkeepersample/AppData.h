@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ARCSingleton.h"
 
 @class RunKeeper;
 
@@ -15,8 +16,8 @@
     RunKeeper *runKeeper;    
 }
 
-@property (nonatomic, retain) RunKeeper *runKeeper;
+SYNTHESIZE_SINGLETON_FOR_CLASS_HEADER(AppData)
 
-+ (AppData*)sharedAppData;
+@property (nonatomic, strong) RunKeeper *runKeeper;
 
 @end

@@ -20,9 +20,9 @@ typedef enum {
 
 @interface RunKeeperPathPoint : NSObject {
 }
-@property (nonatomic, retain) NSDate *time;
+@property (nonatomic, strong) NSDate *time;
 @property (nonatomic, assign) NSTimeInterval timeStamp;
-@property (nonatomic, retain) CLLocation *location;
+@property (nonatomic, strong) CLLocation *location;
 @property (nonatomic, assign) RunKeeperPathPointType pointType;
 
 - (id)initWithLocation:(CLLocation*)loc ofType:(RunKeeperPathPointType)t;

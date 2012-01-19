@@ -47,12 +47,12 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
 - (void)newPathPoint:(NSNotification*)note;
 
-@property (nonatomic, retain) NSDictionary *paths;
-@property (nonatomic, retain) NSNumber *userID;
+@property (nonatomic, strong) NSDictionary *paths;
+@property (nonatomic, strong) NSNumber *userID;
 
 // OAuth stuff
-@property (nonatomic, retain) NSString *clientID, *clientSecret;
-@property (nonatomic, retain, readonly) NXOAuth2Client *oauthClient;
+@property (nonatomic, strong) NSString *clientID, *clientSecret;
+@property (nonatomic, strong, readonly) NXOAuth2Client *oauthClient;
 
 @end
 
@@ -165,7 +165,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 
 
 - (ASIHTTPRequest*)request:(NSString*)path onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __block ASIHTTPRequest *request = [self createRequest:path];    
+    __unsafe_unretained ASIHTTPRequest *request = [self createRequest:path];    
     
     [request setCompletionBlock:^{
         // Use when fetching text data
@@ -184,7 +184,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 }
 
 - (ASIHTTPRequest*)postRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __block ASIFormDataRequest *request = [self createPostRequest:path content:content contentType:contentType];    
+    __unsafe_unretained ASIFormDataRequest *request = [self createPostRequest:path content:content contentType:contentType];    
     
     [request setCompletionBlock:^{
         // Use when fetching text data
@@ -218,9 +218,9 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         self.paths = nil;
         self.userID = nil;
         connected = NO;
-        UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"RunKeeper ERror" 
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"RunKeeper ERror" 
                                                          message:@"Error while communication with RunKeeper."
-                                                        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                                                        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
 }
@@ -355,10 +355,6 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 
 - (void)dealloc {	
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [oauthClient release];
-    [paths release];
-    [userID release];
-	[super dealloc];
 }
 
 

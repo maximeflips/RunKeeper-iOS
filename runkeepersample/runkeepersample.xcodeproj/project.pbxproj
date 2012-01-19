@@ -25,37 +25,37 @@
 		63C1FBDE1424230F0074CF99 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBDC1424230F0074CF99 /* InfoPlist.strings */; };
 		63C1FBE11424230F0074CF99 /* runkeepersampleTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBE01424230F0074CF99 /* runkeepersampleTests.h */; };
 		63C1FBE31424230F0074CF99 /* runkeepersampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBE21424230F0074CF99 /* runkeepersampleTests.m */; };
-		63C1FC3C1424261C0074CF99 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF41424261B0074CF99 /* NSObject+SBJson.m */; };
-		63C1FC3D1424261C0074CF99 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF71424261B0074CF99 /* SBJsonParser.m */; };
-		63C1FC3E1424261C0074CF99 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF91424261B0074CF99 /* SBJsonStreamParser.m */; };
-		63C1FC3F1424261C0074CF99 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBFB1424261B0074CF99 /* SBJsonStreamParserAccumulator.m */; };
-		63C1FC401424261C0074CF99 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBFD1424261B0074CF99 /* SBJsonStreamParserAdapter.m */; };
-		63C1FC411424261C0074CF99 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBFF1424261B0074CF99 /* SBJsonStreamParserState.m */; };
-		63C1FC421424261C0074CF99 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC011424261B0074CF99 /* SBJsonStreamWriter.m */; };
-		63C1FC431424261C0074CF99 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC031424261B0074CF99 /* SBJsonStreamWriterAccumulator.m */; };
-		63C1FC441424261C0074CF99 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC051424261B0074CF99 /* SBJsonStreamWriterState.m */; };
-		63C1FC451424261C0074CF99 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC071424261B0074CF99 /* SBJsonTokeniser.m */; };
-		63C1FC461424261C0074CF99 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC091424261B0074CF99 /* SBJsonUTF8Stream.m */; };
-		63C1FC471424261C0074CF99 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC0B1424261B0074CF99 /* SBJsonWriter.m */; };
-		63C1FC481424261C0074CF99 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC0E1424261B0074CF99 /* ASIAuthenticationDialog.m */; };
-		63C1FC491424261C0074CF99 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC111424261B0074CF99 /* ASIDataCompressor.m */; };
-		63C1FC4A1424261C0074CF99 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC131424261B0074CF99 /* ASIDataDecompressor.m */; };
-		63C1FC4B1424261C0074CF99 /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC151424261B0074CF99 /* ASIDownloadCache.m */; };
-		63C1FC4C1424261C0074CF99 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC171424261B0074CF99 /* ASIFormDataRequest.m */; };
-		63C1FC4D1424261C0074CF99 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC191424261B0074CF99 /* ASIHTTPRequest.m */; };
-		63C1FC4E1424261C0074CF99 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC1D1424261B0074CF99 /* ASIInputStream.m */; };
-		63C1FC4F1424261C0074CF99 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC1F1424261B0074CF99 /* ASINetworkQueue.m */; };
-		63C1FC501424261C0074CF99 /* NSData+NXOAuth2.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC231424261C0074CF99 /* NSData+NXOAuth2.m */; };
-		63C1FC511424261C0074CF99 /* NSString+NXOAuth2.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC251424261C0074CF99 /* NSString+NXOAuth2.m */; };
-		63C1FC521424261C0074CF99 /* NSURL+NXOAuth2.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC271424261C0074CF99 /* NSURL+NXOAuth2.m */; };
-		63C1FC531424261C0074CF99 /* NXOAuth2AccessToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC2B1424261C0074CF99 /* NXOAuth2AccessToken.m */; };
-		63C1FC541424261C0074CF99 /* NXOAuth2Client.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC2D1424261C0074CF99 /* NXOAuth2Client.m */; };
-		63C1FC551424261C0074CF99 /* NXOAuth2Connection.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC301424261C0074CF99 /* NXOAuth2Connection.m */; };
-		63C1FC561424261C0074CF99 /* NXOAuth2Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC331424261C0074CF99 /* NXOAuth2Constants.m */; };
-		63C1FC571424261C0074CF99 /* NXOAuth2FileStreamWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC351424261C0074CF99 /* NXOAuth2FileStreamWrapper.m */; };
-		63C1FC581424261C0074CF99 /* NXOAuth2PostBodyPart.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC371424261C0074CF99 /* NXOAuth2PostBodyPart.m */; };
-		63C1FC591424261C0074CF99 /* NXOAuth2PostBodyStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC391424261C0074CF99 /* NXOAuth2PostBodyStream.m */; };
-		63C1FC5D142426750074CF99 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC5B142426750074CF99 /* Reachability.m */; };
+		63C1FC3C1424261C0074CF99 /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF41424261B0074CF99 /* NSObject+SBJson.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC3D1424261C0074CF99 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF71424261B0074CF99 /* SBJsonParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC3E1424261C0074CF99 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBF91424261B0074CF99 /* SBJsonStreamParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC3F1424261C0074CF99 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBFB1424261B0074CF99 /* SBJsonStreamParserAccumulator.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC401424261C0074CF99 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBFD1424261B0074CF99 /* SBJsonStreamParserAdapter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC411424261C0074CF99 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBFF1424261B0074CF99 /* SBJsonStreamParserState.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC421424261C0074CF99 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC011424261B0074CF99 /* SBJsonStreamWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC431424261C0074CF99 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC031424261B0074CF99 /* SBJsonStreamWriterAccumulator.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC441424261C0074CF99 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC051424261B0074CF99 /* SBJsonStreamWriterState.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC451424261C0074CF99 /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC071424261B0074CF99 /* SBJsonTokeniser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC461424261C0074CF99 /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC091424261B0074CF99 /* SBJsonUTF8Stream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC471424261C0074CF99 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC0B1424261B0074CF99 /* SBJsonWriter.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC481424261C0074CF99 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC0E1424261B0074CF99 /* ASIAuthenticationDialog.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC491424261C0074CF99 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC111424261B0074CF99 /* ASIDataCompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC4A1424261C0074CF99 /* ASIDataDecompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC131424261B0074CF99 /* ASIDataDecompressor.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC4B1424261C0074CF99 /* ASIDownloadCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC151424261B0074CF99 /* ASIDownloadCache.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC4C1424261C0074CF99 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC171424261B0074CF99 /* ASIFormDataRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC4D1424261C0074CF99 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC191424261B0074CF99 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC4E1424261C0074CF99 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC1D1424261B0074CF99 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC4F1424261C0074CF99 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC1F1424261B0074CF99 /* ASINetworkQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC501424261C0074CF99 /* NSData+NXOAuth2.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC231424261C0074CF99 /* NSData+NXOAuth2.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC511424261C0074CF99 /* NSString+NXOAuth2.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC251424261C0074CF99 /* NSString+NXOAuth2.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC521424261C0074CF99 /* NSURL+NXOAuth2.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC271424261C0074CF99 /* NSURL+NXOAuth2.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC531424261C0074CF99 /* NXOAuth2AccessToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC2B1424261C0074CF99 /* NXOAuth2AccessToken.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC541424261C0074CF99 /* NXOAuth2Client.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC2D1424261C0074CF99 /* NXOAuth2Client.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC551424261C0074CF99 /* NXOAuth2Connection.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC301424261C0074CF99 /* NXOAuth2Connection.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC561424261C0074CF99 /* NXOAuth2Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC331424261C0074CF99 /* NXOAuth2Constants.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC571424261C0074CF99 /* NXOAuth2FileStreamWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC351424261C0074CF99 /* NXOAuth2FileStreamWrapper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC581424261C0074CF99 /* NXOAuth2PostBodyPart.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC371424261C0074CF99 /* NXOAuth2PostBodyPart.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC591424261C0074CF99 /* NXOAuth2PostBodyStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC391424261C0074CF99 /* NXOAuth2PostBodyStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		63C1FC5D142426750074CF99 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC5B142426750074CF99 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		63C1FC60142426A20074CF99 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC5E142426A20074CF99 /* CoreLocation.framework */; };
 		63C1FC61142426A20074CF99 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC5F142426A20074CF99 /* SystemConfiguration.framework */; };
 		63C1FC63142426BE0074CF99 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC62142426BE0074CF99 /* CFNetwork.framework */; };
@@ -184,13 +184,13 @@
 		63C1FC64142426D10074CF99 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		63C1FC66142426DC0074CF99 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		63C1FC68142426EB0074CF99 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
-		63C1FC6D142433FC0074CF99 /* SynthesizeSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SynthesizeSingleton.h; sourceTree = "<group>"; };
 		63C1FC77142435AC0074CF99 /* RunKeeper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunKeeper.h; sourceTree = "<group>"; };
 		63C1FC78142435AC0074CF99 /* RunKeeper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunKeeper.m; sourceTree = "<group>"; };
 		63C1FC7A142435D00074CF99 /* RunKeeperErrors.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = RunKeeperErrors.strings; sourceTree = "<group>"; };
 		63C5E66114C7A5C30016E3AA /* connect-blue-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "connect-blue-black.png"; sourceTree = "<group>"; };
 		63C5E66414C7AC0B0016E3AA /* RunKeeperHeartRatePoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunKeeperHeartRatePoint.h; sourceTree = "<group>"; };
 		63C5E66514C7AC0B0016E3AA /* RunKeeperHeartRatePoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunKeeperHeartRatePoint.m; sourceTree = "<group>"; };
+		63C5E67514C7B5680016E3AA /* ARCSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCSingleton.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -424,7 +424,7 @@
 		63C1FC5A1424266B0074CF99 /* Util */ = {
 			isa = PBXGroup;
 			children = (
-				63C1FC6D142433FC0074CF99 /* SynthesizeSingleton.h */,
+				63C5E67514C7B5680016E3AA /* ARCSingleton.h */,
 				63C1FC5B142426750074CF99 /* Reachability.m */,
 				63C1FC5C142426750074CF99 /* Reachability.h */,
 			);
@@ -664,7 +664,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -678,7 +678,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 			};
@@ -688,10 +688,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "runkeepersample/runkeepersample-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "runkeepersample/runkeepersample-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -702,9 +704,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "runkeepersample/runkeepersample-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "runkeepersample/runkeepersample-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_PRODUCT = YES;
@@ -723,6 +727,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "runkeepersampleTests/runkeepersampleTests-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "runkeepersampleTests/runkeepersampleTests-Info.plist";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -745,6 +750,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "runkeepersampleTests/runkeepersampleTests-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "runkeepersampleTests/runkeepersampleTests-Info.plist";
 				OTHER_LDFLAGS = (
 					"-framework",

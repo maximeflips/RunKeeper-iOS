@@ -37,7 +37,7 @@
 
 - (void)updateViews
 {
-    RunKeeper *rk = [AppData sharedAppData].runKeeper;
+    RunKeeper *rk = [AppData sharedInstance].runKeeper;
     self.connectButton.enabled = !rk.connected;
     self.disconnectButton.hidden = !rk.connected;
     self.pauseButton.hidden = YES;
@@ -56,6 +56,9 @@
     self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     self.locationManager.distanceFilter = 0.0;
     [self.locationManager startUpdatingLocation]; 
+    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"History" style:UIBarButtonItemStyleBordered 
+                                                                              target:self action:@selector(viewHistory:)];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -81,7 +84,7 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 1) {
-        RunKeeper *rk = [AppData sharedAppData].runKeeper;
+        RunKeeper *rk = [AppData sharedInstance].runKeeper;
         [rk postActivity:kRKRunning 
                    start:self.beginTime 
                 distance:nil 
@@ -92,17 +95,17 @@
                     path:rk.currentPath 
          heartRatePoints:nil
                  success:^{
-                     UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Success" 
+                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success" 
                                                                       message:@"Your activity was posted to your RunKeeper account."
-                                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
                      [alert show];
                      
                  }
                   failed:^(NSError *err){
                       NSString *msg = [NSString stringWithFormat:@"Upload to RunKeeper failed: %@", [err localizedDescription]]; 
-                      UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Failed" 
+                      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Failed" 
                                                                        message:msg
-                                                                      delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                                                                      delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
                       [alert show];
                   }];
     }
@@ -117,7 +120,7 @@
         self.beginTime = self.startTime;
         [self.startButton setTitle:@"STOP" forState:UIControlStateNormal];
         self.pauseButton.hidden = NO;
-        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKStartPoint] autorelease];
+        RunKeeperPathPoint *point = [[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKStartPoint];
         [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification object:point];
         self.tickTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(tick) userInfo:nil	repeats:YES];
     } else if ((state == kRunning) || (state == kPaused)) {
@@ -128,11 +131,11 @@
         self.tickTimer = nil;
         self.endTime = [NSDate date];
         elapsedTime += [self.endTime timeIntervalSinceDate:self.startTime];
-        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKEndPoint] autorelease];
+        RunKeeperPathPoint *point = [[RunKeeperPathPoint alloc] initWithLocation:self.locationManager.location ofType:kRKEndPoint];
         [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification  object:point];
-        UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Upload?" 
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload?" 
                                                          message:@"Would you like to upload your activity to RunKeeper?"
-                                                        delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"OK", nil] autorelease];
+                                                        delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"OK", nil];
         [alert show];
         self.progressLabel.text = @"Touch start to begin";
         
@@ -147,7 +150,7 @@
         elapsedTime += [[NSDate date] timeIntervalSinceDate:self.startTime];
         [tickTimer invalidate];
         self.tickTimer = nil;
-        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:locationManager.location ofType:kRKPausePoint] autorelease];
+        RunKeeperPathPoint *point = [[RunKeeperPathPoint alloc] initWithLocation:locationManager.location ofType:kRKPausePoint];
         [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification 
                                                             object:point];
     } else if (state == kPaused) {
@@ -155,7 +158,7 @@
         [self.pauseButton setTitle:@"PAUSE" forState:UIControlStateNormal];
         self.startTime = [NSDate date];
         self.tickTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(tick) userInfo:nil	repeats:YES];
-        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:locationManager.location ofType:kRKResumePoint] autorelease];
+        RunKeeperPathPoint *point = [[RunKeeperPathPoint alloc] initWithLocation:locationManager.location ofType:kRKResumePoint];
         [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification 
                                                             object:point];
     }
@@ -163,16 +166,16 @@
 
 - (IBAction)connectToRunKeeper
 {
-    [[AppData sharedAppData].runKeeper tryToConnect:self];
+    [[AppData sharedInstance].runKeeper tryToConnect:self];
 }
 
 - (IBAction)disconnect
 {
-    [[AppData sharedAppData].runKeeper disconnect];
+    [[AppData sharedInstance].runKeeper disconnect];
     [self updateViews];
-    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Disconnect" 
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Disconnect" 
                                                      message:@"Running Intensity is no longer linked to your RunKeeper account"
-                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
 }
 
@@ -186,7 +189,7 @@
 {
     //NSLog(@"didUpdateLocation: %@", newLocation);
     if ((state == kRunning) || (state == kPaused)) {
-        RunKeeperPathPoint *point = [[[RunKeeperPathPoint alloc] initWithLocation:newLocation ofType:kRKGPSPoint] autorelease];
+        RunKeeperPathPoint *point = [[RunKeeperPathPoint alloc] initWithLocation:newLocation ofType:kRKGPSPoint];
         [[NSNotificationCenter defaultCenter] postNotificationName:kRunKeeperNewPointNotification object:point];
     }
     
@@ -198,9 +201,9 @@
 - (void)connected
 {
     [self updateViews];
-    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connected" 
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connected" 
                                                      message:@"Running Intensity is linked to your RunKeeper account"
-                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
     
 }
@@ -209,9 +212,9 @@
 - (void)connectionFailed:(NSError*)err
 {
     [self updateViews];
-    UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Connection Failed" 
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Failed" 
                                                      message:@"The link to your RunKeeper account failed."
-                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease];
+                                                    delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
 }
 
@@ -219,7 +222,7 @@
 // tryToAuthorize at this point
 - (void)needsAuthentication
 {
-    [[AppData sharedAppData].runKeeper tryToAuthorize];
+    [[AppData sharedInstance].runKeeper tryToAuthorize];
 }
 
 
@@ -254,17 +257,9 @@
 
 - (void)dealloc
 {
-    [super dealloc];
-    [self.progressLabel release];
-    [self.startButton release];
-    [self.pauseButton release];
-    [self.disconnectButton release];
-    [self.connectButton release];
     [tickTimer invalidate];
-	[tickTimer release];
     if (locationManager) {
         [locationManager stopUpdatingLocation];
-        [locationManager release];
     }
 }
 

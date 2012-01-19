@@ -49,10 +49,4 @@
             nil];
 }
 
-- (void)dealloc
-{
-    [super dealloc];
-    [self.location release];
-}
-
 @end

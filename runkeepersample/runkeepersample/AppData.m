@@ -7,7 +7,6 @@
 //
 
 #import "AppData.h"
-#import "SynthesizeSingleton.h"
 #import "RunKeeper.h"
 
 #define kRunKeeperClientID @"055cac1c950b46e6ac7910d62800a854"
@@ -25,7 +24,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(AppData)
         return runKeeper;
     }
     
-    self.runKeeper = [[[RunKeeper alloc] initWithClientID:kRunKeeperClientID clientSecret:kRunKeeperClientSecret] autorelease];
+    self.runKeeper = [[RunKeeper alloc] initWithClientID:kRunKeeperClientID clientSecret:kRunKeeperClientSecret];
     return runKeeper;
     
 }
