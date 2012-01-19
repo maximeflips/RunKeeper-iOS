@@ -82,13 +82,15 @@
 {
     if (buttonIndex == 1) {
         RunKeeper *rk = [AppData sharedAppData].runKeeper;
-        [rk postActivity:kRKRunning start:self.beginTime 
-                distance:nil
-                duration:[NSNumber numberWithFloat:[self.endTime timeIntervalSinceDate:self.startTime] + elapsedTime]
+        [rk postActivity:kRKRunning 
+                   start:self.beginTime 
+                distance:nil 
+                duration:[NSNumber numberWithFloat:[self.endTime timeIntervalSinceDate:self.startTime] + elapsedTime] 
                 calories:nil 
-               heartRate:nil 
+            avgHeartRate:nil 
                    notes:@"What a great workout!" 
-                    path:rk.currentPath
+                    path:rk.currentPath 
+         heartRatePoints:nil
                  success:^{
                      UIAlertView *alert = [[[UIAlertView alloc] initWithTitle:@"Success" 
                                                                       message:@"Your activity was posted to your RunKeeper account."
