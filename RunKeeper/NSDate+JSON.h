@@ -9,6 +9,6 @@
 #import <Foundation/Foundation.h>
 
 
-@interface NSDate (SBJSON)
+@interface NSDate (JSON)
 - (id)proxyForJson;
 @end

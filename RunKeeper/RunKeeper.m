@@ -8,11 +8,9 @@
 
 #import "RunKeeper.h"
 #import "RunKeeperPathPoint.h"
-#import "ASIHTTPRequest.h"
-#import "ASIFormDataRequest.h"
-#import "SBJson.h"
-#import "NSObject+SBJson.h"
-
+#import "AFNetworking.h"
+#import "AFJSONRequestOperation.h"
+#import "NSDate+JSON.h"
 
 #define kRunKeeperAuthorizationURL @"https://runkeeper.com/apps/authorize"
 #define kRunKeeperAccessTokenURL @"https://runkeeper.com/apps/token"
@@ -53,6 +51,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 // OAuth stuff
 @property (nonatomic, strong) NSString *clientID, *clientSecret;
 @property (nonatomic, strong, readonly) NXOAuth2Client *oauthClient;
+@property (nonatomic, strong) AFHTTPClient *httpClient;
 
 @end
 
@@ -69,9 +68,14 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     if (self) {
         self.clientID = _clientID;
         self.clientSecret = secret;
+        
+        self.httpClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kRunKeeperBasePath]];
+        self.httpClient.parameterEncoding = AFJSONParameterEncoding;
+        [self.httpClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+        
         connected = self.oauthClient.accessToken != nil;
         self.currentPath = [NSMutableArray array];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newPathPoint:) 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newPathPoint:)
                                                      name:kRunKeeperNewPointNotification object:nil];
     }
     return self;
@@ -133,96 +137,23 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 	return bitlyError;
 }
 
-
-- (ASIHTTPRequest*)createStandardRequest:(NSURL*)url
-{
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    [request addRequestHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
-    request.delegate = self;
-    return request;    
-}
-
-- (ASIHTTPRequest*)createRequest:(NSString*)path {
-    NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
-    //NSLog(@"request URL: %@", str);
-    NSURL *url = [NSURL URLWithString:str];
-    return [self createStandardRequest:url];
-}
-
-- (ASIFormDataRequest*)createPostRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType {
-    NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
-    NSURL *url = [NSURL URLWithString:str];
-    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-    [request addRequestHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
-    [request addRequestHeader:@"Content-Type" value:contentType];
-    request.delegate = self;
-    //[request setPostBody:[content dataUsingEncoding:NSUTF8StringEncoding]];
-    NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
-    [request appendPostData:data]; 
-    //[request setContentLength:[data length]];
-    return request; 
-}
-
-
-- (ASIHTTPRequest*)request:(NSString*)path onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __unsafe_unretained ASIHTTPRequest *request = [self createRequest:path];    
-    
-    [request setCompletionBlock:^{
-        // Use when fetching text data
-        if ([request responseStatusCode] == 200) {
-            if (completion) {
-                completion([[request responseString] JSONValue]);
-            }
-        }
-    }];
-    [request setFailedBlock:^{
-        NSLog(@"*** request failed reason: %@", [request error]);
-        if (failed) failed([request error]);
-    }];
-    [request startAsynchronous];
-    return request;
-}
-
-- (ASIHTTPRequest*)postRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __unsafe_unretained ASIFormDataRequest *request = [self createPostRequest:path content:content contentType:contentType];    
-    
-    [request setCompletionBlock:^{
-        // Use when fetching text data
-        if ([request responseStatusCode] == 201) { // CREATED
-            if (completion) {
-                NSLog(@"Done: %@", [request responseString]);
-                completion(nil);
-                //completion([[request responseString] JSONValue]);
-            }
-        } else {
-            NSError *err = [self errorWithCode:[request responseStatusCode] status:[request responseString]];
-            NSLog(@"postFailed: %d %@", [request responseStatusCode], [request responseString]);
-            if (failed) failed(err);
-        }
-    }];
-    [request setFailedBlock:^{
-        NSLog(@"*** request failed reason: %@", [request error]);
-        if (failed) failed([request error]);
-    }];
-    [request startAsynchronous];
-    return request;
-}
-
-
 - (void)getBasePaths
 {
-    [self request:kRunKeeperBaseURL onCompletion:^(id json) {
-        self.paths = json;
+    [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObject:@"application/vnd.com.runkeeper.user+json"]];
+    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:kRunKeeperBaseURL parameters:nil];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        self.paths = JSON;
         self.userID = [self.paths objectForKey:@"kRKUserIDKey"];
-    } onFailed:^(NSError *err){
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
         self.paths = nil;
         self.userID = nil;
         connected = NO;
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"RunKeeper ERror" 
-                                                         message:@"Error while communication with RunKeeper."
-                                                        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"RunKeeper Error"
+                                                        message:@"Error while communicating with RunKeeper."
+                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #pragma mark RunKeeperAPI Calls
@@ -249,8 +180,8 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 }
 
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
-                 duration:(NSNumber*)duration calories:(NSNumber*)calories avgHeartRate:(NSNumber*)avgHeartRate
-                    notes:(NSString*)notes path:(NSArray*)path  heartRatePoints:(NSArray*)heartRatePoints
+            duration:(NSNumber*)duration calories:(NSNumber*)calories avgHeartRate:(NSNumber*)avgHeartRate
+               notes:(NSString*)notes path:(NSArray*)path  heartRatePoints:(NSArray*)heartRatePoints
              success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed
 {
     if (!connected) {
@@ -258,12 +189,13 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         if (failed) failed(err);
         return;
     }
+    
     NSMutableDictionary *activityDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                          [self activityString:activity], @"type",
-                          start, @"start_time",
-                          distance, @"total_distance",
-                          duration, @"duration",
-                          nil];
+                                               [self activityString:activity], @"type",
+                                               [start proxyForJson], @"start_time",
+                                               distance, @"total_distance",
+                                               duration, @"duration",
+                                               nil];
     
     if (avgHeartRate != nil){
         [activityDictionary setValue:avgHeartRate forKey:@"average_heart_rate"];
@@ -278,24 +210,25 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     }
     
     if (path != nil){
-        [activityDictionary setValue:path forKey:@"path"];
+        [activityDictionary setValue:[path valueForKeyPath:@"proxyForJson"] forKey:@"path"];
     }
     
     if (heartRatePoints != nil){
-        [activityDictionary setValue:heartRatePoints forKey:@"heart_rate"];
+        [activityDictionary setValue:[heartRatePoints valueForKeyPath:@"proxyForJson"] forKey:@"heart_rate"];
     }
-         
-         
     
-    
-    NSString *content = [activityDictionary JSONRepresentation];
-    //NSLog(@"content: %@", content);
-    [self postRequest:[self.paths objectForKey:kRKFitnessActivitiesKey] content:content
-        contentType:@"application/vnd.com.runkeeper.NewFitnessActivity+json" 
-         onCompletion:^(id json) {
-             if (success) success();
-         }
-        onFailed:failed];
+    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"POST" path:[self.paths objectForKey:kRKFitnessActivitiesKey] parameters:activityDictionary];
+    [request setValue:@"application/vnd.com.runkeeper.NewFitnessActivity+json" forHTTPHeaderField:@"Content-Type"];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        if (success) {
+            success();
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #pragma mark NXOAuth2ClientDelegate
@@ -303,6 +236,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 - (void)oauthClientDidGetAccessToken:(NXOAuth2Client *)client
 {
     NSLog(@"didGetAccessToken");
+    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
     connected = YES;
     [self getBasePaths];
     if (delegate && [delegate respondsToSelector:@selector(connected)]) {
@@ -346,17 +280,16 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
                                               authorizeURL:[NSURL URLWithString:kRunKeeperAuthorizationURL]
                                                   tokenURL:[NSURL URLWithString:kRunKeeperAccessTokenURL]
                                                   delegate:self];
-    //NSLog(@"requestAccess: %@", oauthClient.accessToken.accessToken);
+    NSLog(@"requestAccess: %@", oauthClient.accessToken.accessToken);
+    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
     return oauthClient;
 }
 
 #pragma mark -
 #pragma mark Memory management
 
-- (void)dealloc {	
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-
 
 @end

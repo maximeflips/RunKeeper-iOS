@@ -6,10 +6,10 @@
 //  Copyright 2011 Brierwood Design Co-operative. All rights reserved.
 //
 
-#import "NSDate+SBJSON.h"
+#import "NSDate+JSON.h"
 
 
-@implementation NSDate (SBJSON)
+@implementation NSDate (JSON)
 
 /// "Sat, 1 Jan 2011 00:00:00"
 - (id)proxyForJson {
