@@ -25,7 +25,6 @@
 		63C1FBDE1424230F0074CF99 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBDC1424230F0074CF99 /* InfoPlist.strings */; };
 		63C1FBE11424230F0074CF99 /* runkeepersampleTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 63C1FBE01424230F0074CF99 /* runkeepersampleTests.h */; };
 		63C1FBE31424230F0074CF99 /* runkeepersampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FBE21424230F0074CF99 /* runkeepersampleTests.m */; };
-		63C1FC5D142426750074CF99 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C1FC5B142426750074CF99 /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		63C1FC60142426A20074CF99 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC5E142426A20074CF99 /* CoreLocation.framework */; };
 		63C1FC61142426A20074CF99 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC5F142426A20074CF99 /* SystemConfiguration.framework */; };
 		63C1FC63142426BE0074CF99 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C1FC62142426BE0074CF99 /* CFNetwork.framework */; };
@@ -99,8 +98,6 @@
 		63C1FBDF1424230F0074CF99 /* runkeepersampleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "runkeepersampleTests-Prefix.pch"; sourceTree = "<group>"; };
 		63C1FBE01424230F0074CF99 /* runkeepersampleTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = runkeepersampleTests.h; sourceTree = "<group>"; };
 		63C1FBE21424230F0074CF99 /* runkeepersampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = runkeepersampleTests.m; sourceTree = "<group>"; };
-		63C1FC5B142426750074CF99 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = ../../vendor/Reachability.m; sourceTree = "<group>"; };
-		63C1FC5C142426750074CF99 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = ../../vendor/Reachability.h; sourceTree = "<group>"; };
 		63C1FC5E142426A20074CF99 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		63C1FC5F142426A20074CF99 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		63C1FC62142426BE0074CF99 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -113,7 +110,6 @@
 		63C5E66114C7A5C30016E3AA /* connect-blue-black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "connect-blue-black.png"; sourceTree = "<group>"; };
 		63C5E66414C7AC0B0016E3AA /* RunKeeperHeartRatePoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunKeeperHeartRatePoint.h; sourceTree = "<group>"; };
 		63C5E66514C7AC0B0016E3AA /* RunKeeperHeartRatePoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunKeeperHeartRatePoint.m; sourceTree = "<group>"; };
-		63C5E67514C7B5680016E3AA /* ARCSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCSingleton.h; sourceTree = "<group>"; };
 		CC5E10701732DBE900B28DEF /* AFHTTPClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPClient.h; sourceTree = "<group>"; };
 		CC5E10711732DBE900B28DEF /* AFHTTPClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPClient.m; sourceTree = "<group>"; };
 		CC5E10721732DBE900B28DEF /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
@@ -133,7 +129,7 @@
 		CC5E10801732DBE900B28DEF /* AFXMLRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFXMLRequestOperation.m; sourceTree = "<group>"; };
 		CC5E10811732DBE900B28DEF /* UIImageView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+AFNetworking.h"; sourceTree = "<group>"; };
 		CC5E10821732DBE900B28DEF /* UIImageView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+AFNetworking.m"; sourceTree = "<group>"; };
-		CC5E108C1732DBF000B28DEF /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		CC5E108C1732DBF000B28DEF /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../Default-568h@2x.png"; sourceTree = "<group>"; };
 		CC5E108F1732DCAF00B28DEF /* NSData+NXOAuth2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+NXOAuth2.h"; sourceTree = "<group>"; };
 		CC5E10901732DCAF00B28DEF /* NSData+NXOAuth2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+NXOAuth2.m"; sourceTree = "<group>"; };
 		CC5E10911732DCAF00B28DEF /* NSString+NXOAuth2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+NXOAuth2.h"; sourceTree = "<group>"; };
@@ -166,6 +162,7 @@
 		CC5E10AD1732DCAF00B28DEF /* NXOAuth2TrustDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NXOAuth2TrustDelegate.h; sourceTree = "<group>"; };
 		CC5E10AE1732DCAF00B28DEF /* OAuth2Client_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAuth2Client_Prefix.pch; sourceTree = "<group>"; };
 		CC5E10BC1732DD0200B28DEF /* NXOAuth2Account+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NXOAuth2Account+Private.h"; path = "../NXOAuth2Account+Private.h"; sourceTree = "<group>"; };
+		CC5E10BE1732E42900B28DEF /* ARCSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCSingleton.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -201,13 +198,6 @@
 		63C1FBA41424230F0074CF99 = {
 			isa = PBXGroup;
 			children = (
-				CC5E108C1732DBF000B28DEF /* Default-568h@2x.png */,
-				63C1FC68142426EB0074CF99 /* MobileCoreServices.framework */,
-				63C1FC66142426DC0074CF99 /* libz.dylib */,
-				63C1FC64142426D10074CF99 /* Security.framework */,
-				63C1FC62142426BE0074CF99 /* CFNetwork.framework */,
-				63C1FC5E142426A20074CF99 /* CoreLocation.framework */,
-				63C1FC5F142426A20074CF99 /* SystemConfiguration.framework */,
 				63C1FBB91424230F0074CF99 /* runkeepersample */,
 				63C1FBD91424230F0074CF99 /* runkeepersampleTests */,
 				63C1FBB21424230F0074CF99 /* Frameworks */,
@@ -227,9 +217,15 @@
 		63C1FBB21424230F0074CF99 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				63C1FBB31424230F0074CF99 /* UIKit.framework */,
-				63C1FBB51424230F0074CF99 /* Foundation.framework */,
+				63C1FC62142426BE0074CF99 /* CFNetwork.framework */,
 				63C1FBB71424230F0074CF99 /* CoreGraphics.framework */,
+				63C1FC5E142426A20074CF99 /* CoreLocation.framework */,
+				63C1FBB51424230F0074CF99 /* Foundation.framework */,
+				63C1FC66142426DC0074CF99 /* libz.dylib */,
+				63C1FC68142426EB0074CF99 /* MobileCoreServices.framework */,
+				63C1FC64142426D10074CF99 /* Security.framework */,
+				63C1FC5F142426A20074CF99 /* SystemConfiguration.framework */,
+				63C1FBB31424230F0074CF99 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -237,18 +233,19 @@
 		63C1FBB91424230F0074CF99 /* runkeepersample */ = {
 			isa = PBXGroup;
 			children = (
-				63C1FC76142435AC0074CF99 /* RunKeeper */,
-				63C1FBEF142424BE0074CF99 /* Resources */,
-				63C1FBC21424230F0074CF99 /* runkeepersampleAppDelegate.h */,
-				63C1FBC31424230F0074CF99 /* runkeepersampleAppDelegate.m */,
+				63077882142987D300E1ECD4 /* AppData.h */,
+				63077883142987D300E1ECD4 /* AppData.m */,
+				CC5E10BE1732E42900B28DEF /* ARCSingleton.h */,
 				63C1FBC51424230F0074CF99 /* MainWindow.xib */,
 				63C1FBC81424230F0074CF99 /* RootViewController.h */,
 				63C1FBC91424230F0074CF99 /* RootViewController.m */,
 				63C1FBCB1424230F0074CF99 /* RootViewController.xib */,
+				63C1FBC21424230F0074CF99 /* runkeepersampleAppDelegate.h */,
+				63C1FBC31424230F0074CF99 /* runkeepersampleAppDelegate.m */,
+				63C1FBEF142424BE0074CF99 /* Resources */,
+				63C1FC76142435AC0074CF99 /* RunKeeper */,
 				63C1FBBA1424230F0074CF99 /* Supporting Files */,
 				CC5E10BD1732DDCA00B28DEF /* Vendor */,
-				63077882142987D300E1ECD4 /* AppData.h */,
-				63077883142987D300E1ECD4 /* AppData.m */,
 			);
 			path = runkeepersample;
 			sourceTree = "<group>";
@@ -288,18 +285,9 @@
 			isa = PBXGroup;
 			children = (
 				63C5E66114C7A5C30016E3AA /* connect-blue-black.png */,
+				CC5E108C1732DBF000B28DEF /* Default-568h@2x.png */,
 			);
 			name = Resources;
-			sourceTree = "<group>";
-		};
-		63C1FC5A1424266B0074CF99 /* Util */ = {
-			isa = PBXGroup;
-			children = (
-				63C5E67514C7B5680016E3AA /* ARCSingleton.h */,
-				63C1FC5B142426750074CF99 /* Reachability.m */,
-				63C1FC5C142426750074CF99 /* Reachability.h */,
-			);
-			name = Util;
 			sourceTree = "<group>";
 		};
 		63C1FC76142435AC0074CF99 /* RunKeeper */ = {
@@ -399,7 +387,6 @@
 			children = (
 				CC5E106F1732DBE900B28DEF /* AFNetworking */,
 				CC5E108E1732DCAF00B28DEF /* OAuth2Client */,
-				63C1FC5A1424266B0074CF99 /* Util */,
 			);
 			name = Vendor;
 			sourceTree = "<group>";
@@ -515,7 +502,6 @@
 				63C1FBC11424230F0074CF99 /* main.m in Sources */,
 				63C1FBC41424230F0074CF99 /* runkeepersampleAppDelegate.m in Sources */,
 				63C1FBCA1424230F0074CF99 /* RootViewController.m in Sources */,
-				63C1FC5D142426750074CF99 /* Reachability.m in Sources */,
 				63C1FC79142435AC0074CF99 /* RunKeeper.m in Sources */,
 				63077884142987D400E1ECD4 /* AppData.m in Sources */,
 				63B65AA9142A5FA400BA4D63 /* NSDate+JSON.m in Sources */,
