@@ -9,10 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "NXOAuth2.h"
 
+@class RunKeeperFitnessActivity;
 
 // Some typedefs to make the ugly code slightly less ugly
 typedef void(^RIBasicCompletionBlock)(void);
 typedef void(^RIJSONCompletionBlock)(id json);
+typedef void(^RIFitnessActivityCompletionBlock)(RunKeeperFitnessActivity* activity);
 typedef void(^RIBasicFailedBlock)(NSError *err);
 typedef void(^RIPaginatorCompletionBlock)(NSArray* items, NSUInteger page, NSUInteger totalPages);
 
@@ -104,10 +106,17 @@ extern NSString *const kRunKeeperNewPointNotification;
 /** Post an activity to RunKeeper --- will fail unless you are already connected.  Almost all of
  the parameters are optional -- the only requirements are those of the RunKeeper web API itself which
  is to provide a start time, activity type, and either the distance or path points. */
-- (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
-                 duration:(NSNumber*)duration calories:(NSNumber*)calories avgHeartRate:(NSNumber*)avgHeartRate
-               notes:(NSString*)notes path:(NSArray*)path heartRatePoints:(NSArray*)heartRatePoints
-             success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed;
+- (void)postActivity:(RunKeeperActivityType)activity
+               start:(NSDate*)start
+            distance:(NSNumber*)distance
+            duration:(NSNumber*)duration
+            calories:(NSNumber*)calories
+        avgHeartRate:(NSNumber*)avgHeartRate
+               notes:(NSString*)notes
+                path:(NSArray*)path
+     heartRatePoints:(NSArray*)heartRatePoints
+             success:(RIBasicCompletionBlock)success
+              failed:(RIBasicFailedBlock)failed;
 
 /** Retrieves the complete fitness activity feed from Runkeeper. Since RunKeeper returns the feed in pages, the method will
  recursively retrieve all pages and will call the success block with all retrieved objects upon completion. The progress
@@ -120,6 +129,10 @@ extern NSString *const kRunKeeperNewPointNotification;
                                    progress:(RIPaginatorCompletionBlock)progress
                                     success:(RIPaginatorCompletionBlock)success
                                      failed:(RIBasicFailedBlock)failed;
+
+- (void)getFitnessActivity:(NSString*)uri
+                   success:(RIFitnessActivityCompletionBlock)success
+                    failed:(RIBasicFailedBlock)failed;
 
 @end
 

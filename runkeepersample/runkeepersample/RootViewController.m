@@ -9,6 +9,7 @@
 #import "RootViewController.h"
 #import "AppData.h"
 #import "RunKeeperPathPoint.h"
+#import "RunKeeperFitnessActivity.h"
 
 @implementation NSString (NSString_TimeInterval)
 
@@ -183,6 +184,13 @@
                                        NSLog(@"Page: %d / %d, count: %d", page+1, totalPages, items.count);
                                    } success:^(NSArray *items, NSUInteger page, NSUInteger totalPages) {
                                        NSLog(@"FINISHED Page: %d / %d, count: %d", page+1, totalPages, items.count);
+                                       
+                                       RunKeeperFitnessActivity* activity = items[0];
+                                       [rk getFitnessActivity:activity.uri success:^(RunKeeperFitnessActivity *activity) {
+                                           NSLog(@"Success", nil);
+                                       } failed:^(NSError *err) {
+                                           NSLog(@"Error: %@", [err localizedDescription]);
+                                       }];
                                    } failed:^(NSError *err) {
                                        NSLog(@"Error: %@", [err localizedDescription]);
                                    }];

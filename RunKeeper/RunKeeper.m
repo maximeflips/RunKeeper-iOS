@@ -8,7 +8,7 @@
 
 #import "RunKeeper.h"
 #import "RunKeeperPathPoint.h"
-#import "RunKeeperFitnessActivityItem.h"
+#import "RunKeeperFitnessActivity.h"
 #import "AFNetworking.h"
 #import "AFJSONRequestOperation.h"
 #import "NSDate+JSON.h"
@@ -83,8 +83,9 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         [self.httpClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
         
         [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/vnd.com.runkeeper.user+json",
-                                                           @"application/vnd.com.runkeeper.FitnessActivityFeed+json",
                                                            @"application/vnd.com.runkeeper.fitnessactivityfeed+json",
+                                                           @"application/vnd.com.runkeeper.fitnessactivitysummary+json",
+                                                           @"application/vnd.com.runkeeper.fitnessactivity+json",
                                                            nil]];
 
         connected = self.oauthClient.accessToken != nil;
@@ -342,6 +343,34 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     [self loadNextPage:[self.paths objectForKey:kRKFitnessActivitiesKey] parameters:dict progress:progress success:success failed:failed];
 }
 
+- (void)fillFitnessActivity:(RunKeeperFitnessActivity*)item fromFeedDict:(NSDictionary*)itemDict
+{
+    item.activityType = [RunKeeper activityType:[itemDict objectForKey:@"type"]];
+    item.startTime = [NSDate dateFromJSONDate:[itemDict objectForKey:@"start_time"]];
+    item.totalDistanceInMeters = [itemDict objectForKey:@"total_distance"];
+    item.durationInSeconds = [itemDict objectForKey:@"duration"];
+    item.source = [itemDict objectForKey:@"source"];
+    item.entryMode = [itemDict objectForKey:@"entry_mode"];
+    item.hasPath = [[itemDict objectForKey:@"has_path"] boolValue];
+    item.uri = [itemDict objectForKey:@"uri"];
+}
+
+- (void)fillFitnessActivity:(RunKeeperFitnessActivity*)item fromSummaryDict:(NSDictionary*)itemDict
+{
+    [self fillFitnessActivity:item fromFeedDict:itemDict];
+    item.userID = [itemDict objectForKey:@"userID"];
+    item.secondaryType = [itemDict objectForKey:@"secondary_type"];
+    item.equipment = [itemDict objectForKey:@"equipment"];
+    item.averageHeartRate = [itemDict objectForKey:@"average_heart_rate"];
+    item.totalCalories = [itemDict objectForKey:@"total_calories"];
+    item.climbInMeters = [itemDict objectForKey:@"climb"];
+    item.notes = [itemDict objectForKey:@"notes"];
+    item.isLive = [[itemDict objectForKey:@"is_live"] boolValue];
+    item.share = [itemDict objectForKey:@"share"];
+    item.shareMap = [itemDict objectForKey:@"share_map"];
+    item.publicURI = [itemDict objectForKey:@"activity"];
+}
+
 - (void)loadNextPage:(NSString*)uri
           parameters:(NSDictionary*)dict
             progress:(RIPaginatorCompletionBlock)progress
@@ -355,15 +384,8 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         NSArray* itemDicts = [JSON objectForKey:@"items"];
         NSMutableArray* items = [NSMutableArray arrayWithCapacity:itemDicts.count];
         for( NSDictionary* itemDict in itemDicts ) {
-            RunKeeperFitnessActivityItem* item = [[RunKeeperFitnessActivityItem alloc] init];
-            item.activityType = [RunKeeper activityType:[itemDict objectForKey:@"type"]];
-            item.startTime = [NSDate dateFromJSONDate:[itemDict objectForKey:@"start_time"]];
-            item.totalDistanceInMeters = [[itemDict objectForKey:@"total_distance"] doubleValue];
-            item.durationInSeconds = [[itemDict objectForKey:@"duration"] doubleValue];
-            item.source = [itemDict objectForKey:@"source"];
-            item.entryMode = [itemDict objectForKey:@"entry_mode"];
-            item.hasPath = [[itemDict objectForKey:@"has_path"] boolValue];
-            item.uri = [itemDict objectForKey:@"uri"];
+            RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
+            [self fillFitnessActivity:item fromFeedDict:itemDict];
             [items addObject:item];
         }
         [_allItems addObjectsFromArray:items];
@@ -394,6 +416,28 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
         _isLoading = NO;
         _allItems = nil;
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
+}
+
+- (void)getFitnessActivity:(NSString*)uri
+                   success:(RIFitnessActivityCompletionBlock)success
+                    failed:(RIBasicFailedBlock)failed
+{
+    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:uri parameters:nil];
+    [request setValue:@"application/vnd.com.runkeeper.FitnessActivitySummary+json" forHTTPHeaderField:@"Accept"];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
+                                                                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
+    {
+        RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
+        [self fillFitnessActivity:item fromSummaryDict:JSON];
+        if ( success ) {
+            success(item);
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
         if ( failed ) {
             failed(error);
         }
