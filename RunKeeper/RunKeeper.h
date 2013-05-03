@@ -130,9 +130,11 @@ extern NSString *const kRunKeeperNewPointNotification;
                                     success:(RIPaginatorCompletionBlock)success
                                      failed:(RIBasicFailedBlock)failed;
 
-- (void)getFitnessActivity:(NSString*)uri
-                   success:(RIFitnessActivityCompletionBlock)success
-                    failed:(RIBasicFailedBlock)failed;
+/** Retrieves the summary information for a single fitness activity URI and returns the populated activity object in 
+the success block */
+- (void)getFitnessActivitySummary:(NSString*)uri
+                          success:(RIFitnessActivityCompletionBlock)success
+                           failed:(RIBasicFailedBlock)failed;
 
 @end
 

@@ -185,12 +185,15 @@
                                    } success:^(NSArray *items, NSUInteger page, NSUInteger totalPages) {
                                        NSLog(@"FINISHED Page: %d / %d, count: %d", page+1, totalPages, items.count);
                                        
-                                       RunKeeperFitnessActivity* activity = items[0];
-                                       [rk getFitnessActivity:activity.uri success:^(RunKeeperFitnessActivity *activity) {
-                                           NSLog(@"Success", nil);
-                                       } failed:^(NSError *err) {
-                                           NSLog(@"Error: %@", [err localizedDescription]);
-                                       }];
+                                       __block NSUInteger index = 1;
+                                       for( RunKeeperFitnessActivity* act in items ) {
+                                           [rk getFitnessActivitySummary:act.uri success:^(RunKeeperFitnessActivity *activity) {
+                                               NSLog(@"%d: %@", index, activity);
+                                               index++;
+                                           } failed:^(NSError *err) {
+                                               NSLog(@"Error: %@", [err localizedDescription]);
+                                           }];
+                                       }
                                    } failed:^(NSError *err) {
                                        NSLog(@"Error: %@", [err localizedDescription]);
                                    }];

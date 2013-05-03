@@ -78,6 +78,9 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         self.clientID = _clientID;
         self.clientSecret = secret;
         
+        AFNetworkActivityIndicatorManager* man = [AFNetworkActivityIndicatorManager sharedManager];
+        man.enabled = YES;
+        
         self.httpClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kRunKeeperBasePath]];
         self.httpClient.parameterEncoding = AFJSONParameterEncoding;
         [self.httpClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
@@ -423,16 +426,16 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
-- (void)getFitnessActivity:(NSString*)uri
-                   success:(RIFitnessActivityCompletionBlock)success
-                    failed:(RIBasicFailedBlock)failed
+- (void)getFitnessActivitySummary:(NSString*)uri
+                          success:(RIFitnessActivityCompletionBlock)success
+                           failed:(RIBasicFailedBlock)failed
 {
     NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:uri parameters:nil];
     [request setValue:@"application/vnd.com.runkeeper.FitnessActivitySummary+json" forHTTPHeaderField:@"Accept"];
     AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
                                                                                         success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
-    {
-        RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
+                                         {
+                                             RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
         [self fillFitnessActivity:item fromSummaryDict:JSON];
         if ( success ) {
             success(item);
