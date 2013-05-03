@@ -1,6 +1,6 @@
 //
 //  RunKeeper.h
-//  rrgps-iphone
+//  RunKeeper-iOS
 //
 //  Created by Reid van Melle on 11-09-14.
 //  Copyright 2011 Brierwood Design Co-operative. All rights reserved.
@@ -14,7 +14,7 @@
 typedef void(^RIBasicCompletionBlock)(void);
 typedef void(^RIJSONCompletionBlock)(id json);
 typedef void(^RIBasicFailedBlock)(NSError *err);
-
+typedef void(^RIPaginatorCompletionBlock)(NSArray* items, NSUInteger page, NSUInteger totalPages);
 
 // All of the activity types supported by the RunKeeper API in a slick little enum
 typedef enum {
@@ -95,6 +95,12 @@ extern NSString *const kRunKeeperNewPointNotification;
  are not actual network calls being made */
 - (void)disconnect;
 
+/** Returns the proper string for API calls from the given acitivity type */
++ (NSString*)activityString:(RunKeeperActivityType)activity;
+
+/** Returns the activity type for the string retrieved in the "type" field from the API */
++ (RunKeeperActivityType)activityType:(NSString*)type;
+
 /** Post an activity to RunKeeper --- will fail unless you are already connected.  Almost all of
  the parameters are optional -- the only requirements are those of the RunKeeper web API itself which
  is to provide a start time, activity type, and either the distance or path points. */
@@ -103,6 +109,17 @@ extern NSString *const kRunKeeperNewPointNotification;
                notes:(NSString*)notes path:(NSArray*)path heartRatePoints:(NSArray*)heartRatePoints
              success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed;
 
+/** Retrieves the complete fitness activity feed from Runkeeper. Since RunKeeper returns the feed in pages, the method will
+ recursively retrieve all pages and will call the success block with all retrieved objects upon completion. The progress
+ block will be called after every loaded page and contains objects retrieved for that page. The retrieved object lists 
+ contain instances of RunKeeperFitnessActivityItem. */
+- (void)getFitnessActivityFeedNoEarlierThan:(NSDate*)noEarlierThan
+                                noLaterThan:(NSDate*)noLaterThan
+                      modifiedNoEarlierThan:(NSDate*)modifiedNoEarlierThan
+                        modifiedNoLaterThan:(NSDate*)modifiedNoLaterThan
+                                   progress:(RIPaginatorCompletionBlock)progress
+                                    success:(RIPaginatorCompletionBlock)success
+                                     failed:(RIBasicFailedBlock)failed;
 
 @end
 

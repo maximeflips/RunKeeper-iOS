@@ -164,6 +164,30 @@
     }
 }
 
+- (IBAction)getPastActivities:(id)sender
+{
+    if ( ![[AppData sharedInstance].runKeeper connected] ){
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Failed"
+                                                        message:@"You are not connected to your RunKeeper account."
+                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    
+    RunKeeper *rk = [AppData sharedInstance].runKeeper;
+    [rk getFitnessActivityFeedNoEarlierThan:nil
+                                noLaterThan:nil
+                      modifiedNoEarlierThan:nil
+                        modifiedNoLaterThan:nil
+                                   progress:^(NSArray *items, NSUInteger page, NSUInteger totalPages) {
+                                       NSLog(@"Page: %d / %d, count: %d", page+1, totalPages, items.count);
+                                   } success:^(NSArray *items, NSUInteger page, NSUInteger totalPages) {
+                                       NSLog(@"FINISHED Page: %d / %d, count: %d", page+1, totalPages, items.count);
+                                   } failed:^(NSError *err) {
+                                       NSLog(@"Error: %@", [err localizedDescription]);
+                                   }];
+}
+
 - (IBAction)connectToRunKeeper
 {
     [[AppData sharedInstance].runKeeper tryToConnect:self];
