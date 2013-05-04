@@ -6,12 +6,13 @@
 //  Copyright 2011 Brierwood Design Co-operative. All rights reserved.
 //
 
-#import "RunKeeper.h"
-#import "RunKeeperPathPoint.h"
-#import "RunKeeperFitnessActivity.h"
 #import "AFNetworking.h"
 #import "AFJSONRequestOperation.h"
 #import "NSDate+JSON.h"
+#import "RunKeeper.h"
+#import "RunKeeperPathPoint.h"
+#import "RunKeeperFitnessActivity.h"
+#import "RunKeeperProfile.h"
 
 #define kRunKeeperAuthorizationURL @"https://runkeeper.com/apps/authorize"
 #define kRunKeeperAccessTokenURL @"https://runkeeper.com/apps/token"
@@ -174,6 +175,41 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 }
 
 #pragma mark RunKeeperAPI Calls
+
+- (void)getProfileOnSuccess:(void (^)(RunKeeperProfile *profile))success
+                     failed:(RIBasicFailedBlock)failed
+{
+    if (!connected) {
+        NSError *err = [self errorWithCode:kNotConnectedErrorCode status:@"You are not connected to RunKeeper"];
+        if (failed) failed(err);
+        return;
+    }
+
+    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:[self.paths objectForKey:kRKProfileKey] parameters:nil];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        RunKeeperProfile* profile = [[RunKeeperProfile alloc] init];
+        profile.name = [JSON objectForKey:@"name"];
+        profile.location = [JSON objectForKey:@"location"];
+        profile.athleteType = [JSON objectForKey:@"athlete_type"];
+        profile.gender = [JSON objectForKey:@"gender"];
+        profile.birthday = [JSON objectForKey:@"birthday"];
+        profile.elite = [[JSON objectForKey:@"elite"] boolValue];
+        profile.profile = [JSON objectForKey:@"profile"];
+        profile.smallPicture = [JSON objectForKey:@"small_picture"];
+        profile.normalPicture = [JSON objectForKey:@"normal_picture"];
+        profile.mediumPicture = [JSON objectForKey:@"medium_picture"];
+        profile.largePicture = [JSON objectForKey:@"large_picture"];
+
+        if ( success ) {
+            success(profile);
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
+}
 
 + (NSString*)activityString:(RunKeeperActivityType)activity
 {

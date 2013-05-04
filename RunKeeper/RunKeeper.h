@@ -10,6 +10,7 @@
 #import "NXOAuth2.h"
 
 @class RunKeeperFitnessActivity;
+@class RunKeeperProfile;
 
 // Some typedefs to make the ugly code slightly less ugly
 typedef void(^RIBasicCompletionBlock)(void);
@@ -102,6 +103,10 @@ extern NSString *const kRunKeeperNewPointNotification;
 
 /** Returns the activity type for the string retrieved in the "type" field from the API */
 + (RunKeeperActivityType)activityType:(NSString*)type;
+
+/** Returns the profile of the connected user */
+- (void)getProfileOnSuccess:(void (^)(RunKeeperProfile *profile))success
+                     failed:(RIBasicFailedBlock)failed;
 
 /** Post an activity to RunKeeper --- will fail unless you are already connected.  Almost all of
  the parameters are optional -- the only requirements are those of the RunKeeper web API itself which

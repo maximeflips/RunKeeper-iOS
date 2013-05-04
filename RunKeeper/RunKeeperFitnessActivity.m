@@ -13,9 +13,14 @@
 // For debugging purposes
 - (NSString*)description
 {
-    return [NSString stringWithFormat:@"Date: %@, type: %@, distance: %@, duration: %@, calories: %@, uri: %@",
-            _startTime, [RunKeeper activityString:_activityType], _totalDistanceInMeters,
-            _durationInSeconds, _totalCalories, _uri];
+    return [NSString stringWithFormat:@"Date: %@, type: %@, distance: %.2f, duration: %.2f, calories: %@, cal/h: %.0f, uri: %@",
+            _startTime,
+            [RunKeeper activityString:_activityType],
+            _totalDistanceInMeters.doubleValue / 1000.0,
+            _durationInSeconds.doubleValue / 60.0,
+            _totalCalories,
+            _totalCalories.doubleValue / (_durationInSeconds.doubleValue / 60.0) * 60.0,
+            _uri];
 }
 
 @end

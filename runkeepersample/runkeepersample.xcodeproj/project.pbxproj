@@ -60,6 +60,7 @@
 		CC5E10BA1732DCAF00B28DEF /* NXOAuth2PostBodyStream.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5E10AA1732DCAF00B28DEF /* NXOAuth2PostBodyStream.m */; };
 		CC5E10BB1732DCAF00B28DEF /* NXOAuth2Request.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5E10AC1732DCAF00B28DEF /* NXOAuth2Request.m */; };
 		CC5E10C3173320EA00B28DEF /* RunKeeperFitnessActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = CC5E10C2173320EA00B28DEF /* RunKeeperFitnessActivity.m */; };
+		CCFAF3F717359A6800E3A0FE /* RunKeeperProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = CCFAF3F617359A6800E3A0FE /* RunKeeperProfile.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +167,8 @@
 		CC5E10BE1732E42900B28DEF /* ARCSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCSingleton.h; sourceTree = "<group>"; };
 		CC5E10C1173320EA00B28DEF /* RunKeeperFitnessActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunKeeperFitnessActivity.h; sourceTree = "<group>"; };
 		CC5E10C2173320EA00B28DEF /* RunKeeperFitnessActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunKeeperFitnessActivity.m; sourceTree = "<group>"; };
+		CCFAF3F517359A6800E3A0FE /* RunKeeperProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunKeeperProfile.h; sourceTree = "<group>"; };
+		CCFAF3F617359A6800E3A0FE /* RunKeeperProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunKeeperProfile.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -307,6 +310,8 @@
 				63C5E66514C7AC0B0016E3AA /* RunKeeperHeartRatePoint.m */,
 				CC5E10C1173320EA00B28DEF /* RunKeeperFitnessActivity.h */,
 				CC5E10C2173320EA00B28DEF /* RunKeeperFitnessActivity.m */,
+				CCFAF3F517359A6800E3A0FE /* RunKeeperProfile.h */,
+				CCFAF3F617359A6800E3A0FE /* RunKeeperProfile.m */,
 			);
 			name = RunKeeper;
 			path = ../../RunKeeper;
@@ -535,6 +540,7 @@
 				CC5E10BA1732DCAF00B28DEF /* NXOAuth2PostBodyStream.m in Sources */,
 				CC5E10BB1732DCAF00B28DEF /* NXOAuth2Request.m in Sources */,
 				CC5E10C3173320EA00B28DEF /* RunKeeperFitnessActivity.m in Sources */,
+				CCFAF3F717359A6800E3A0FE /* RunKeeperProfile.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
