@@ -90,6 +90,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
                                                            @"application/vnd.com.runkeeper.fitnessactivityfeed+json",
                                                            @"application/vnd.com.runkeeper.fitnessactivitysummary+json",
                                                            @"application/vnd.com.runkeeper.fitnessactivity+json",
+                                                           @"application/vnd.com.runkeeper.profile+json",
                                                            nil]];
 
         connected = self.oauthClient.accessToken != nil;

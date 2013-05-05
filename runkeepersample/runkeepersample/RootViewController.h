@@ -32,8 +32,9 @@ typedef enum {
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) NSDate *beginTime, *startTime, *endTime;
 @property (nonatomic, strong) NSTimer *tickTimer;
-@property (nonatomic, strong) IBOutlet UILabel *progressLabel;
-@property (nonatomic, strong) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
+@property (nonatomic, weak) IBOutlet UILabel *progressLabel;
+@property (nonatomic, weak) IBOutlet UIButton *startButton, *pauseButton, *disconnectButton, *connectButton;
+@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 
 - (IBAction)toggleStart;
 - (IBAction)togglePause;

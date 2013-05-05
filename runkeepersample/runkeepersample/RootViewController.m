@@ -10,6 +10,7 @@
 #import "AppData.h"
 #import "RunKeeperPathPoint.h"
 #import "RunKeeperFitnessActivity.h"
+#import "RunKeeperProfile.h"
 
 @implementation NSString (NSString_TimeInterval)
 
@@ -60,6 +61,16 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"History" style:UIBarButtonItemStyleBordered 
                                                                               target:self action:@selector(viewHistory:)];
+        RunKeeper *rk = [AppData sharedInstance].runKeeper;
+    if ( rk.connected ) {
+        double delayInSeconds = 2.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            [[AppData sharedInstance].runKeeper getProfileOnSuccess:^(RunKeeperProfile *profile) {
+                _nameLabel.text = profile.name;
+            } failed:nil];
+        });
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -236,6 +247,9 @@
 - (void)connected
 {
     [self updateViews];
+    [[AppData sharedInstance].runKeeper getProfileOnSuccess:^(RunKeeperProfile *profile) {
+        _nameLabel.text = profile.name;
+    } failed:nil];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connected" 
                                                      message:@"Running Intensity is linked to your RunKeeper account"
                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -279,6 +293,7 @@
 
 - (void)viewDidUnload
 {
+    [self setNameLabel:nil];
     [super viewDidUnload];
     self.progressLabel = nil;
     self.startButton = nil;
