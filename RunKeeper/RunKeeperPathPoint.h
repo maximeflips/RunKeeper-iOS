@@ -1,6 +1,6 @@
 //
 //  RunKeeperPathPoint.h
-//  runkeepersample
+//  RunKeeper-iOS
 //
 //  Created by Reid van Melle on 11-09-21.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.

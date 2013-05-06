@@ -1,18 +1,18 @@
 //
 //  RunKeeper.m
-//  rrgps-iphone
+//  RunKeeper-iOS
 //
 //  Created by Reid van Melle on 11-09-14.
 //  Copyright 2011 Brierwood Design Co-operative. All rights reserved.
 //
 
+#import "AFNetworking.h"
+#import "AFJSONRequestOperation.h"
+#import "NSDate+JSON.h"
 #import "RunKeeper.h"
 #import "RunKeeperPathPoint.h"
-#import "ASIHTTPRequest.h"
-#import "ASIFormDataRequest.h"
-#import "SBJson.h"
-#import "NSObject+SBJson.h"
-
+#import "RunKeeperFitnessActivity.h"
+#import "RunKeeperProfile.h"
 
 #define kRunKeeperAuthorizationURL @"https://runkeeper.com/apps/authorize"
 #define kRunKeeperAccessTokenURL @"https://runkeeper.com/apps/token"
@@ -20,7 +20,8 @@
 #define kRunKeeperBasePath @"https://api.runkeeper.com"
 #define kRunKeeperBaseURL @"/user/"
 
-#define kNotConnectedErrorCode 100
+#define kNotConnectedErrorCode         100
+#define kPaginatorStillActiveErrorCode 101
 
 #define kRKBackgroundActivitiesKey        @"background_activities"
 #define kRKDiabetesKey                    @"diabetes"
@@ -42,6 +43,13 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 
 
 @interface RunKeeper()
+{
+    BOOL _isLoading;
+    NSUInteger _pageSize;
+    NSUInteger _currentPage;
+    NSUInteger _totalPages;
+    NSMutableArray* _allItems;
+}
 
 - (NSString*)localizedStatusText:(NSString*)bitlyStatusTxt;
 - (NSError*)errorWithCode:(NSInteger)code status:(NSString*)status;
@@ -53,6 +61,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 // OAuth stuff
 @property (nonatomic, strong) NSString *clientID, *clientSecret;
 @property (nonatomic, strong, readonly) NXOAuth2Client *oauthClient;
+@property (nonatomic, strong) AFHTTPClient *httpClient;
 
 @end
 
@@ -69,9 +78,24 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     if (self) {
         self.clientID = _clientID;
         self.clientSecret = secret;
+        
+        AFNetworkActivityIndicatorManager* man = [AFNetworkActivityIndicatorManager sharedManager];
+        man.enabled = YES;
+        
+        self.httpClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kRunKeeperBasePath]];
+        self.httpClient.parameterEncoding = AFJSONParameterEncoding;
+        [self.httpClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
+        
+        [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/vnd.com.runkeeper.user+json",
+                                                           @"application/vnd.com.runkeeper.fitnessactivityfeed+json",
+                                                           @"application/vnd.com.runkeeper.fitnessactivitysummary+json",
+                                                           @"application/vnd.com.runkeeper.fitnessactivity+json",
+                                                           @"application/vnd.com.runkeeper.profile+json",
+                                                           nil]];
+
         connected = self.oauthClient.accessToken != nil;
         self.currentPath = [NSMutableArray array];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newPathPoint:) 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newPathPoint:)
                                                      name:kRunKeeperNewPointNotification object:nil];
     }
     return self;
@@ -133,101 +157,62 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 	return bitlyError;
 }
 
-
-- (ASIHTTPRequest*)createStandardRequest:(NSURL*)url
-{
-    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
-    [request addRequestHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
-    request.delegate = self;
-    return request;    
-}
-
-- (ASIHTTPRequest*)createRequest:(NSString*)path {
-    NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
-    //NSLog(@"request URL: %@", str);
-    NSURL *url = [NSURL URLWithString:str];
-    return [self createStandardRequest:url];
-}
-
-- (ASIFormDataRequest*)createPostRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType {
-    NSString *str = [NSString stringWithFormat:@"%@%@", kRunKeeperBasePath, path];
-    NSURL *url = [NSURL URLWithString:str];
-    ASIFormDataRequest *request = [ASIFormDataRequest requestWithURL:url];
-    [request addRequestHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
-    [request addRequestHeader:@"Content-Type" value:contentType];
-    request.delegate = self;
-    //[request setPostBody:[content dataUsingEncoding:NSUTF8StringEncoding]];
-    NSData *data = [content dataUsingEncoding:NSUTF8StringEncoding];
-    [request appendPostData:data]; 
-    //[request setContentLength:[data length]];
-    return request; 
-}
-
-
-- (ASIHTTPRequest*)request:(NSString*)path onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __unsafe_unretained ASIHTTPRequest *request = [self createRequest:path];    
-    
-    [request setCompletionBlock:^{
-        // Use when fetching text data
-        if ([request responseStatusCode] == 200) {
-            if (completion) {
-                completion([[request responseString] JSONValue]);
-            }
-        }
-    }];
-    [request setFailedBlock:^{
-        NSLog(@"*** request failed reason: %@", [request error]);
-        if (failed) failed([request error]);
-    }];
-    [request startAsynchronous];
-    return request;
-}
-
-- (ASIHTTPRequest*)postRequest:(NSString*)path content:(NSString*)content contentType:(NSString*)contentType onCompletion:(RIJSONCompletionBlock)completion onFailed:(RIBasicFailedBlock)failed {
-    __unsafe_unretained ASIFormDataRequest *request = [self createPostRequest:path content:content contentType:contentType];    
-    
-    [request setCompletionBlock:^{
-        // Use when fetching text data
-        if ([request responseStatusCode] == 201) { // CREATED
-            if (completion) {
-                NSLog(@"Done: %@", [request responseString]);
-                completion(nil);
-                //completion([[request responseString] JSONValue]);
-            }
-        } else {
-            NSError *err = [self errorWithCode:[request responseStatusCode] status:[request responseString]];
-            NSLog(@"postFailed: %d %@", [request responseStatusCode], [request responseString]);
-            if (failed) failed(err);
-        }
-    }];
-    [request setFailedBlock:^{
-        NSLog(@"*** request failed reason: %@", [request error]);
-        if (failed) failed([request error]);
-    }];
-    [request startAsynchronous];
-    return request;
-}
-
-
 - (void)getBasePaths
 {
-    [self request:kRunKeeperBaseURL onCompletion:^(id json) {
-        self.paths = json;
+    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:kRunKeeperBaseURL parameters:nil];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        self.paths = JSON;
         self.userID = [self.paths objectForKey:@"kRKUserIDKey"];
-    } onFailed:^(NSError *err){
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
         self.paths = nil;
         self.userID = nil;
         connected = NO;
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"RunKeeper ERror" 
-                                                         message:@"Error while communication with RunKeeper."
-                                                        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"RunKeeper Error"
+                                                        message:@"Error while communicating with RunKeeper."
+                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #pragma mark RunKeeperAPI Calls
 
-- (NSString*)activityString:(RunKeeperActivityType)activity
+- (void)getProfileOnSuccess:(void (^)(RunKeeperProfile *profile))success
+                     failed:(RIBasicFailedBlock)failed
+{
+    if (!connected) {
+        NSError *err = [self errorWithCode:kNotConnectedErrorCode status:@"You are not connected to RunKeeper"];
+        if (failed) failed(err);
+        return;
+    }
+
+    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:[self.paths objectForKey:kRKProfileKey] parameters:nil];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        RunKeeperProfile* profile = [[RunKeeperProfile alloc] init];
+        profile.name = [JSON objectForKey:@"name"];
+        profile.location = [JSON objectForKey:@"location"];
+        profile.athleteType = [JSON objectForKey:@"athlete_type"];
+        profile.gender = [JSON objectForKey:@"gender"];
+        profile.birthday = [JSON objectForKey:@"birthday"];
+        profile.elite = [[JSON objectForKey:@"elite"] boolValue];
+        profile.profile = [JSON objectForKey:@"profile"];
+        profile.smallPicture = [JSON objectForKey:@"small_picture"];
+        profile.normalPicture = [JSON objectForKey:@"normal_picture"];
+        profile.mediumPicture = [JSON objectForKey:@"medium_picture"];
+        profile.largePicture = [JSON objectForKey:@"large_picture"];
+
+        if ( success ) {
+            success(profile);
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
+}
+
++ (NSString*)activityString:(RunKeeperActivityType)activity
 {
     switch (activity) {
         case kRKRunning:        return @"Running";
@@ -248,9 +233,53 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     return @"Running";
 }
 
++ (RunKeeperActivityType)activityType:(NSString*)type
+{
+    if ( [type isEqualToString:@"Running"] ) {
+        return kRKRunning;
+    }
+    else if ( [type isEqualToString:@"Cycling"] ) {
+        return kRKCycling;
+    }
+    else if ( [type isEqualToString:@"Mountain Biking"] ) {
+        return kRKMountainBiking;
+    }
+    else if ( [type isEqualToString:@"Walking"] ) {
+        return kRKWalking;
+    }
+    else if ( [type isEqualToString:@"Hiking"] ) {
+        return kRKHiking;
+    }
+    else if ( [type isEqualToString:@"Downhill Skiing"] ) {
+        return kRKDownhillSkiing;
+    }
+    else if ( [type isEqualToString:@"Cross Country Skiing"] ) {
+        return kRKXCountrySkiing;
+    }
+    else if ( [type isEqualToString:@"Snowboarding"] ) {
+        return kRKSnowboarding;
+    }
+    else if ( [type isEqualToString:@"Skating"] ) {
+        return kRKSkating;
+    }
+    else if ( [type isEqualToString:@"Swimming"] ) {
+        return kRKSwimming;
+    }
+    else if ( [type isEqualToString:@"Wheelchair"] ) {
+        return kRKWheelchair;
+    }
+    else if ( [type isEqualToString:@"Rowing"] ) {
+        return kRKRowing;
+    }
+    else if ( [type isEqualToString:@"Elliptical"] ) {
+        return kRKElliptical;
+    }
+    return kRKOther;
+}
+
 - (void)postActivity:(RunKeeperActivityType)activity start:(NSDate*)start distance:(NSNumber*)distance
-                 duration:(NSNumber*)duration calories:(NSNumber*)calories avgHeartRate:(NSNumber*)avgHeartRate
-                    notes:(NSString*)notes path:(NSArray*)path  heartRatePoints:(NSArray*)heartRatePoints
+            duration:(NSNumber*)duration calories:(NSNumber*)calories avgHeartRate:(NSNumber*)avgHeartRate
+               notes:(NSString*)notes path:(NSArray*)path  heartRatePoints:(NSArray*)heartRatePoints
              success:(RIBasicCompletionBlock)success failed:(RIBasicFailedBlock)failed
 {
     if (!connected) {
@@ -258,12 +287,13 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         if (failed) failed(err);
         return;
     }
+    
     NSMutableDictionary *activityDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                          [self activityString:activity], @"type",
-                          start, @"start_time",
-                          distance, @"total_distance",
-                          duration, @"duration",
-                          nil];
+                                               [RunKeeper activityString:activity], @"type",
+                                               [start proxyForJson], @"start_time",
+                                               distance, @"total_distance",
+                                               duration, @"duration",
+                                               nil];
     
     if (avgHeartRate != nil){
         [activityDictionary setValue:avgHeartRate forKey:@"average_heart_rate"];
@@ -278,24 +308,181 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
     }
     
     if (path != nil){
-        [activityDictionary setValue:path forKey:@"path"];
+        [activityDictionary setValue:[path valueForKeyPath:@"proxyForJson"] forKey:@"path"];
     }
     
     if (heartRatePoints != nil){
-        [activityDictionary setValue:heartRatePoints forKey:@"heart_rate"];
+        [activityDictionary setValue:[heartRatePoints valueForKeyPath:@"proxyForJson"] forKey:@"heart_rate"];
     }
-         
-         
     
+    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"POST"
+                                                                 path:[self.paths objectForKey:kRKFitnessActivitiesKey]
+                                                           parameters:activityDictionary];
+    [request setValue:@"application/vnd.com.runkeeper.NewFitnessActivity+json" forHTTPHeaderField:@"Content-Type"];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        if (success) {
+            success();
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
+}
+
+#define SecondsPerDay (24 * 60 * 60)
+
+- (void)getFitnessActivityFeedNoEarlierThan:(NSDate*)noEarlierThan
+                                noLaterThan:(NSDate*)noLaterThan
+                      modifiedNoEarlierThan:(NSDate*)modifiedNoEarlierThan
+                        modifiedNoLaterThan:(NSDate*)modifiedNoLaterThan
+                                   progress:(RIPaginatorCompletionBlock)progress
+                                    success:(RIPaginatorCompletionBlock)success
+                                     failed:(RIBasicFailedBlock)failed
+{
+    if (!connected) {
+        NSError *err = [self errorWithCode:kNotConnectedErrorCode status:@"You are not connected to RunKeeper"];
+        if (failed) failed(err);
+        return;
+    }
+
+    if ( _isLoading ) {
+        NSError *err = [self errorWithCode:kPaginatorStillActiveErrorCode status:@"The paginator is still active"];
+        if (failed) failed(err);
+        return;
+    }
     
-    NSString *content = [activityDictionary JSONRepresentation];
-    //NSLog(@"content: %@", content);
-    [self postRequest:[self.paths objectForKey:kRKFitnessActivitiesKey] content:content
-        contentType:@"application/vnd.com.runkeeper.NewFitnessActivity+json" 
-         onCompletion:^(id json) {
-             if (success) success();
-         }
-        onFailed:failed];
+    _isLoading = YES;
+    _pageSize = 25;
+    _currentPage = 0;
+    _totalPages = 1;
+    _allItems = [NSMutableArray array];
+        
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy-MM-dd";
+    
+    if ( !noEarlierThan ) {
+        noEarlierThan = [NSDate dateWithTimeIntervalSince1970:0];
+    }
+    if ( !modifiedNoEarlierThan ) {
+        modifiedNoEarlierThan = [NSDate dateWithTimeIntervalSince1970:0];
+    }
+    if ( !noLaterThan ) {
+        noLaterThan = [NSDate dateWithTimeIntervalSinceNow:SecondsPerDay * 2]; // this is what RunKeeper does by default
+    }
+    if ( !modifiedNoLaterThan ) {
+        modifiedNoLaterThan = [NSDate dateWithTimeIntervalSinceNow:SecondsPerDay * 2]; // this is what RunKeeper does by default
+    }
+    
+    NSDictionary* dict = @{@"pageSize" : @(_pageSize),
+                           @"noEarlierThan" : [dateFormatter stringFromDate:noEarlierThan],
+                           @"noLaterThan" : [dateFormatter stringFromDate:noLaterThan],
+                           @"modifiedNoEarlierThan" : [dateFormatter stringFromDate:modifiedNoEarlierThan],
+                           @"modifiedNoLaterThan" : [dateFormatter stringFromDate:modifiedNoLaterThan]};
+    [self loadNextPage:[self.paths objectForKey:kRKFitnessActivitiesKey] parameters:dict progress:progress success:success failed:failed];
+}
+
+- (void)fillFitnessActivity:(RunKeeperFitnessActivity*)item fromFeedDict:(NSDictionary*)itemDict
+{
+    item.activityType = [RunKeeper activityType:[itemDict objectForKey:@"type"]];
+    item.startTime = [NSDate dateFromJSONDate:[itemDict objectForKey:@"start_time"]];
+    item.totalDistanceInMeters = [itemDict objectForKey:@"total_distance"];
+    item.durationInSeconds = [itemDict objectForKey:@"duration"];
+    item.source = [itemDict objectForKey:@"source"];
+    item.entryMode = [itemDict objectForKey:@"entry_mode"];
+    item.hasPath = [[itemDict objectForKey:@"has_path"] boolValue];
+    item.uri = [itemDict objectForKey:@"uri"];
+}
+
+- (void)fillFitnessActivity:(RunKeeperFitnessActivity*)item fromSummaryDict:(NSDictionary*)itemDict
+{
+    [self fillFitnessActivity:item fromFeedDict:itemDict];
+    item.userID = [itemDict objectForKey:@"userID"];
+    item.secondaryType = [itemDict objectForKey:@"secondary_type"];
+    item.equipment = [itemDict objectForKey:@"equipment"];
+    item.averageHeartRate = [itemDict objectForKey:@"average_heart_rate"];
+    item.totalCalories = [itemDict objectForKey:@"total_calories"];
+    item.climbInMeters = [itemDict objectForKey:@"climb"];
+    item.notes = [itemDict objectForKey:@"notes"];
+    item.isLive = [[itemDict objectForKey:@"is_live"] boolValue];
+    item.share = [itemDict objectForKey:@"share"];
+    item.shareMap = [itemDict objectForKey:@"share_map"];
+    item.publicURI = [itemDict objectForKey:@"activity"];
+}
+
+- (void)loadNextPage:(NSString*)uri
+          parameters:(NSDictionary*)dict
+            progress:(RIPaginatorCompletionBlock)progress
+             success:(RIPaginatorCompletionBlock)success
+              failed:(RIBasicFailedBlock)failed
+{
+    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET"
+                                                                 path:uri
+                                                           parameters:dict];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        NSArray* itemDicts = [JSON objectForKey:@"items"];
+        NSMutableArray* items = [NSMutableArray arrayWithCapacity:itemDicts.count];
+        for( NSDictionary* itemDict in itemDicts ) {
+            RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
+            [self fillFitnessActivity:item fromFeedDict:itemDict];
+            [items addObject:item];
+        }
+        [_allItems addObjectsFromArray:items];
+        
+        if ( _currentPage == 0 ) {
+            _totalPages = roundf(([[JSON objectForKey:@"size"] floatValue] / (float)_pageSize) + 0.5);
+        }
+        
+        if ( _totalPages == 1 || _currentPage == _totalPages-1 ) { // We reached the last page
+            _isLoading = NO;
+            if ( progress ) {
+                progress(items, _currentPage, _totalPages);
+            }
+            if ( success ) {
+                success(_allItems, _currentPage, _totalPages);
+            }
+            _allItems = nil;
+        }
+        else { // Load next page recursively
+            NSString* nextPageURI = [JSON objectForKey:@"next"];
+            [self loadNextPage:nextPageURI parameters:nil progress:progress success:success failed:failed];
+            
+            if ( progress ) {
+                progress(items, _currentPage, _totalPages);
+            }
+            _currentPage++;
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        _isLoading = NO;
+        _allItems = nil;
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
+}
+
+- (void)getFitnessActivitySummary:(NSString*)uri
+                          success:(RIFitnessActivityCompletionBlock)success
+                           failed:(RIBasicFailedBlock)failed
+{
+    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:uri parameters:nil];
+    [request setValue:@"application/vnd.com.runkeeper.FitnessActivitySummary+json" forHTTPHeaderField:@"Accept"];
+    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
+                                                                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
+                                         {
+                                             RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
+        [self fillFitnessActivity:item fromSummaryDict:JSON];
+        if ( success ) {
+            success(item);
+        }
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        if ( failed ) {
+            failed(error);
+        }
+    }];
+    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #pragma mark NXOAuth2ClientDelegate
@@ -303,6 +490,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 - (void)oauthClientDidGetAccessToken:(NXOAuth2Client *)client
 {
     NSLog(@"didGetAccessToken");
+    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
     connected = YES;
     [self getBasePaths];
     if (delegate && [delegate respondsToSelector:@selector(connected)]) {
@@ -346,17 +534,15 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
                                               authorizeURL:[NSURL URLWithString:kRunKeeperAuthorizationURL]
                                                   tokenURL:[NSURL URLWithString:kRunKeeperAccessTokenURL]
                                                   delegate:self];
-    //NSLog(@"requestAccess: %@", oauthClient.accessToken.accessToken);
+    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
     return oauthClient;
 }
 
 #pragma mark -
 #pragma mark Memory management
 
-- (void)dealloc {	
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-
 
 @end

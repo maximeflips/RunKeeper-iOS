@@ -9,6 +9,8 @@
 #import "RootViewController.h"
 #import "AppData.h"
 #import "RunKeeperPathPoint.h"
+#import "RunKeeperFitnessActivity.h"
+#import "RunKeeperProfile.h"
 
 @implementation NSString (NSString_TimeInterval)
 
@@ -59,6 +61,16 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"History" style:UIBarButtonItemStyleBordered 
                                                                               target:self action:@selector(viewHistory:)];
+        RunKeeper *rk = [AppData sharedInstance].runKeeper;
+    if ( rk.connected ) {
+        double delayInSeconds = 2.0;
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+            [[AppData sharedInstance].runKeeper getProfileOnSuccess:^(RunKeeperProfile *profile) {
+                _nameLabel.text = profile.name;
+            } failed:nil];
+        });
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -164,6 +176,40 @@
     }
 }
 
+- (IBAction)getPastActivities:(id)sender
+{
+    if ( ![[AppData sharedInstance].runKeeper connected] ){
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Failed"
+                                                        message:@"You are not connected to your RunKeeper account."
+                                                       delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+    
+    RunKeeper *rk = [AppData sharedInstance].runKeeper;
+    [rk getFitnessActivityFeedNoEarlierThan:nil
+                                noLaterThan:nil
+                      modifiedNoEarlierThan:nil
+                        modifiedNoLaterThan:nil
+                                   progress:^(NSArray *items, NSUInteger page, NSUInteger totalPages) {
+                                       NSLog(@"Page: %d / %d, count: %d", page+1, totalPages, items.count);
+                                   } success:^(NSArray *items, NSUInteger page, NSUInteger totalPages) {
+                                       NSLog(@"FINISHED Page: %d / %d, count: %d", page+1, totalPages, items.count);
+                                       
+                                       __block NSUInteger index = 1;
+                                       for( RunKeeperFitnessActivity* act in items ) {
+                                           [rk getFitnessActivitySummary:act.uri success:^(RunKeeperFitnessActivity *activity) {
+                                               NSLog(@"%d: %@", index, activity);
+                                               index++;
+                                           } failed:^(NSError *err) {
+                                               NSLog(@"Error: %@", [err localizedDescription]);
+                                           }];
+                                       }
+                                   } failed:^(NSError *err) {
+                                       NSLog(@"Error: %@", [err localizedDescription]);
+                                   }];
+}
+
 - (IBAction)connectToRunKeeper
 {
     [[AppData sharedInstance].runKeeper tryToConnect:self];
@@ -201,6 +247,9 @@
 - (void)connected
 {
     [self updateViews];
+    [[AppData sharedInstance].runKeeper getProfileOnSuccess:^(RunKeeperProfile *profile) {
+        _nameLabel.text = profile.name;
+    } failed:nil];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connected" 
                                                      message:@"Running Intensity is linked to your RunKeeper account"
                                                     delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -244,6 +293,7 @@
 
 - (void)viewDidUnload
 {
+    [self setNameLabel:nil];
     [super viewDidUnload];
     self.progressLabel = nil;
     self.startButton = nil;
