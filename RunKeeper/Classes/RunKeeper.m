@@ -7,7 +7,6 @@
 //
 
 #import "AFNetworking.h"
-#import "AFJSONRequestOperation.h"
 #import "NSDate+JSON.h"
 #import "RunKeeper.h"
 #import "RunKeeperPathPoint.h"
@@ -61,7 +60,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 // OAuth stuff
 @property (nonatomic, strong) NSString *clientID, *clientSecret;
 @property (nonatomic, strong, readonly) NXOAuth2Client *oauthClient;
-@property (nonatomic, strong) AFHTTPClient *httpClient;
+@property (nonatomic, strong) AFHTTPRequestOperationManager *httpClient;
 
 @end
 
@@ -79,19 +78,19 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         self.clientID = _clientID;
         self.clientSecret = secret;
         
-        AFNetworkActivityIndicatorManager* man = [AFNetworkActivityIndicatorManager sharedManager];
-        man.enabled = YES;
+//        AFNetworkActivityIndicatorManager* man = [AFNetworkActivityIndicatorManager sharedManager];
+//        man.enabled = YES;
         
-        self.httpClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:kRunKeeperBasePath]];
-        self.httpClient.parameterEncoding = AFJSONParameterEncoding;
-        [self.httpClient registerHTTPOperationClass:[AFJSONRequestOperation class]];
-        
-        [AFJSONRequestOperation addAcceptableContentTypes:[NSSet setWithObjects:@"application/vnd.com.runkeeper.user+json",
+        self.httpClient = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:kRunKeeperBasePath]];
+        [self.httpClient setRequestSerializer:[AFJSONRequestSerializer serializer]];
+        self.httpClient.responseSerializer = [AFJSONResponseSerializer serializer];
+        self.httpClient.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"application/vnd.com.runkeeper.user+json",
                                                            @"application/vnd.com.runkeeper.fitnessactivityfeed+json",
                                                            @"application/vnd.com.runkeeper.fitnessactivitysummary+json",
                                                            @"application/vnd.com.runkeeper.fitnessactivity+json",
                                                            @"application/vnd.com.runkeeper.profile+json",
-                                                           nil]];
+                                                           @"text/plain",
+                                                           nil];
 
         connected = self.oauthClient.accessToken != nil;
         self.currentPath = [NSMutableArray array];
@@ -159,11 +158,16 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 
 - (void)getBasePaths
 {
-    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:kRunKeeperBaseURL parameters:nil];
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        self.paths = JSON;
-        self.userID = [self.paths objectForKey:@"kRKUserIDKey"];
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+//    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:kRunKeeperBaseURL parameters:nil];
+//    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+    NSLog(@"Http client headers: %@", self.httpClient.requestSerializer.HTTPRequestHeaders);
+    NSLog(@"response object for base paths: %@", kRunKeeperBaseURL);
+    [self.httpClient GET:kRunKeeperBaseURL parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"response object for base paths: %@", responseObject);
+        self.paths = responseObject;
+        self.userID = [self.paths objectForKey:kRKUserIDKey];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Failure: %@", error);
         self.paths = nil;
         self.userID = nil;
         connected = NO;
@@ -172,7 +176,8 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
                                                        delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }];
-    [self.httpClient enqueueHTTPRequestOperation:operation];
+    
+//    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #pragma mark RunKeeperAPI Calls
@@ -186,30 +191,29 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         return;
     }
 
-    NSURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:[self.paths objectForKey:kRKProfileKey] parameters:nil];
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+    [self.httpClient GET:[self.paths objectForKey:kRKProfileKey] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         RunKeeperProfile* profile = [[RunKeeperProfile alloc] init];
-        profile.name = [JSON objectForKey:@"name"];
-        profile.location = [JSON objectForKey:@"location"];
-        profile.athleteType = [JSON objectForKey:@"athlete_type"];
-        profile.gender = [JSON objectForKey:@"gender"];
-        profile.birthday = [JSON objectForKey:@"birthday"];
-        profile.elite = [[JSON objectForKey:@"elite"] boolValue];
-        profile.profile = [JSON objectForKey:@"profile"];
-        profile.smallPicture = [JSON objectForKey:@"small_picture"];
-        profile.normalPicture = [JSON objectForKey:@"normal_picture"];
-        profile.mediumPicture = [JSON objectForKey:@"medium_picture"];
-        profile.largePicture = [JSON objectForKey:@"large_picture"];
+        profile.name = [responseObject objectForKey:@"name"];
+        profile.location = [responseObject objectForKey:@"location"];
+        profile.athleteType = [responseObject objectForKey:@"athlete_type"];
+        profile.gender = [responseObject objectForKey:@"gender"];
+        profile.birthday = [responseObject objectForKey:@"birthday"];
+        profile.elite = [[responseObject objectForKey:@"elite"] boolValue];
+        profile.profile = [responseObject objectForKey:@"profile"];
+        profile.smallPicture = [responseObject objectForKey:@"small_picture"];
+        profile.normalPicture = [responseObject objectForKey:@"normal_picture"];
+        profile.mediumPicture = [responseObject objectForKey:@"medium_picture"];
+        profile.largePicture = [responseObject objectForKey:@"large_picture"];
 
         if ( success ) {
             success(profile);
         }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if ( failed ) {
             failed(error);
         }
     }];
-    [self.httpClient enqueueHTTPRequestOperation:operation];
+//    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 + (NSString*)activityString:(RunKeeperActivityType)activity
@@ -315,20 +319,21 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         [activityDictionary setValue:[heartRatePoints valueForKeyPath:@"proxyForJson"] forKey:@"heart_rate"];
     }
     
-    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"POST"
-                                                                 path:[self.paths objectForKey:kRKFitnessActivitiesKey]
-                                                           parameters:activityDictionary];
-    [request setValue:@"application/vnd.com.runkeeper.NewFitnessActivity+json" forHTTPHeaderField:@"Content-Type"];
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+//    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"POST"
+//                                                                 path:[self.paths objectForKey:kRKFitnessActivitiesKey]
+//                                                           parameters:activityDictionary];
+//    [request setValue:@"application/vnd.com.runkeeper.NewFitnessActivity+json" forHTTPHeaderField:@"Content-Type"];
+//    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+    [self.httpClient POST:[self.paths objectForKey:kRKFitnessActivitiesKey] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         if (success) {
             success();
         }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if ( failed ) {
             failed(error);
         }
     }];
-    [self.httpClient enqueueHTTPRequestOperation:operation];
+//    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #define SecondsPerDay (24 * 60 * 60)
@@ -417,11 +422,16 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
              success:(RIPaginatorCompletionBlock)success
               failed:(RIBasicFailedBlock)failed
 {
-    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET"
-                                                                 path:uri
-                                                           parameters:dict];
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-        NSArray* itemDicts = [JSON objectForKey:@"items"];
+//    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET"
+//                                                                 path:uri
+//                                                           parameters:dict];
+//    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+    NSLog(@"Http client headers: %@", self.httpClient.requestSerializer.HTTPRequestHeaders);
+    NSLog(@"Base url: %@", self.httpClient.baseURL);
+    NSLog(@"Getting next page: %@", uri);
+    [self.httpClient GET:uri parameters:dict success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"Next page response: %@", responseObject);
+        NSArray* itemDicts = [responseObject objectForKey:@"items"];
         NSMutableArray* items = [NSMutableArray arrayWithCapacity:itemDicts.count];
         for( NSDictionary* itemDict in itemDicts ) {
             RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
@@ -431,7 +441,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         [_allItems addObjectsFromArray:items];
         
         if ( _currentPage == 0 ) {
-            _totalPages = roundf(([[JSON objectForKey:@"size"] floatValue] / (float)_pageSize) + 0.5);
+            _totalPages = roundf(([[responseObject objectForKey:@"size"] floatValue] / (float)_pageSize) + 0.5);
         }
         
         if ( _totalPages == 1 || _currentPage == _totalPages-1 ) { // We reached the last page
@@ -445,7 +455,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
             _allItems = nil;
         }
         else { // Load next page recursively
-            NSString* nextPageURI = [JSON objectForKey:@"next"];
+            NSString* nextPageURI = [responseObject objectForKey:@"next"];
             [self loadNextPage:nextPageURI parameters:nil progress:progress success:success failed:failed];
             
             if ( progress ) {
@@ -453,36 +463,37 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
             }
             _currentPage++;
         }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error log: %@", error);
         _isLoading = NO;
         _allItems = nil;
         if ( failed ) {
             failed(error);
         }
     }];
-    [self.httpClient enqueueHTTPRequestOperation:operation];
+    
 }
 
 - (void)getFitnessActivitySummary:(NSString*)uri
                           success:(RIFitnessActivityCompletionBlock)success
                            failed:(RIBasicFailedBlock)failed
 {
-    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:uri parameters:nil];
-    [request setValue:@"application/vnd.com.runkeeper.FitnessActivitySummary+json" forHTTPHeaderField:@"Accept"];
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
-                                                                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
-                                         {
-                                             RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
-        [self fillFitnessActivity:item fromSummaryDict:JSON];
+//    NSMutableURLRequest *request = [self.httpClient requestWithMethod:@"GET" path:uri parameters:nil];
+//    [request setValue:@"application/vnd.com.runkeeper.FitnessActivitySummary+json" forHTTPHeaderField:@"Accept"];
+//    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request
+//                                                                                        success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON)
+//                                         {
+    [self.httpClient GET:uri parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        RunKeeperFitnessActivity* item = [[RunKeeperFitnessActivity alloc] init];
+        [self fillFitnessActivity:item fromSummaryDict:responseObject];
         if ( success ) {
             success(item);
         }
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         if ( failed ) {
             failed(error);
         }
     }];
-    [self.httpClient enqueueHTTPRequestOperation:operation];
 }
 
 #pragma mark NXOAuth2ClientDelegate
@@ -490,7 +501,9 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 - (void)oauthClientDidGetAccessToken:(NXOAuth2Client *)client
 {
     NSLog(@"didGetAccessToken");
-    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
+    NSLog(@"Access token: %@", oauthClient.accessToken.accessToken);
+    [self.httpClient.requestSerializer setValue:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken] forHTTPHeaderField:@"Authorization"];
+//    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
     connected = YES;
     [self getBasePaths];
     if (delegate && [delegate respondsToSelector:@selector(connected)]) {
@@ -527,6 +540,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
         return oauthClient;
     }
     
+    NSLog(@"Setting value for header");
     assert(clientID);
     assert(clientSecret);
     oauthClient = [[NXOAuth2Client alloc] initWithClientID:clientID
@@ -534,7 +548,8 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
                                               authorizeURL:[NSURL URLWithString:kRunKeeperAuthorizationURL]
                                                   tokenURL:[NSURL URLWithString:kRunKeeperAccessTokenURL]
                                                   delegate:self];
-    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
+//    [self.httpClient setDefaultHeader:@"Authorization" value:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken]];
+    [self.httpClient.requestSerializer setValue:[NSString stringWithFormat:@"Bearer %@", oauthClient.accessToken.accessToken] forHTTPHeaderField:@"Authorization"];
     return oauthClient;
 }
 

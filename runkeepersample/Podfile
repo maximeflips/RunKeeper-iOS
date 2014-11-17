@@ -1,0 +1,4 @@
+source 'git@bitbucket.org:iterar/itcocoapodsspecs.git'
+source 'https://github.com/CocoaPods/Specs.git'
+
+pod "RunKeeper-iOS", :path => "../"

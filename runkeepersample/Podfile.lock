@@ -1,0 +1,40 @@
+PODS:
+  - AFNetworking (2.4.1):
+    - AFNetworking/NSURLConnection (= 2.4.1)
+    - AFNetworking/NSURLSession (= 2.4.1)
+    - AFNetworking/Reachability (= 2.4.1)
+    - AFNetworking/Security (= 2.4.1)
+    - AFNetworking/Serialization (= 2.4.1)
+    - AFNetworking/UIKit (= 2.4.1)
+  - AFNetworking/NSURLConnection (2.4.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.4.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (2.4.1)
+  - AFNetworking/Security (2.4.1)
+  - AFNetworking/Serialization (2.4.1)
+  - AFNetworking/UIKit (2.4.1):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - NXOAuth2Client (1.2.8)
+  - RunKeeper-iOS (0.0.1):
+    - AFNetworking (~> 2.3)
+    - NXOAuth2Client (~> 1.2.8)
+
+DEPENDENCIES:
+  - RunKeeper-iOS (from `../`)
+
+EXTERNAL SOURCES:
+  RunKeeper-iOS:
+    :path: ../
+
+SPEC CHECKSUMS:
+  AFNetworking: 0aabc6fae66d6e5d039eeb21c315843c7aae51ab
+  NXOAuth2Client: fa81be68c9ce628202028ae037c9c92cfbb37865
+  RunKeeper-iOS: e3949b48dedf79681ab7831f33df41c3190e1da7
+
+COCOAPODS: 0.35.0.rc1
