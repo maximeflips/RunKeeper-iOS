@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NXOAuth2.h"
+#import "NXOAuth2Client/NXOAuth2.h"
 
 @class RunKeeperFitnessActivity;
 @class RunKeeperProfile;
