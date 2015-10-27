@@ -392,6 +392,7 @@ NSString *const kRunKeeperNewPointNotification = @"RunKeeperNewPointNotification
 {
     item.activityType = [RunKeeper activityType:[itemDict objectForKey:@"type"]];
     item.startTime = [NSDate dateFromJSONDate:[itemDict objectForKey:@"start_time"]];
+    item.utcOffset = [itemDict objectForKey:@"utc_offset"];
     item.totalDistanceInMeters = [itemDict objectForKey:@"total_distance"];
     item.durationInSeconds = [itemDict objectForKey:@"duration"];
     item.source = [itemDict objectForKey:@"source"];

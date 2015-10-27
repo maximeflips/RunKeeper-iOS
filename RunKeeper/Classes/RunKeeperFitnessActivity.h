@@ -24,6 +24,9 @@
 // The starting time for the activity (e.g., Sat, 1 Jan 2011 00:00:00)
 @property (nonatomic, strong) NSDate* startTime;
 
+// The UTC offset of the timezone for the activity
+@property (nonatomic, strong) NSNumber* utcOffset;
+
 // The total distance for the activity, in meters
 @property (nonatomic, strong) NSNumber* totalDistanceInMeters;
 
